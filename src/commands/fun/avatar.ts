@@ -19,7 +19,8 @@ export const command: CommandBase = {
     ephemeral: false,
     category: CommandBaseCategory.FUN,
     needsDefer: true,
-    async run(interaction, client) {
+    
+    async run({interaction}) {
         const user = interaction.options.getUser("usuario") ?? interaction.user
         let member = interaction.options.getMember("usuario") ?? interaction.member
 

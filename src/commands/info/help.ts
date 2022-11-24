@@ -11,7 +11,7 @@ export const command: CommandBase = {
     needsDefer: true,
     category: CommandBaseCategory.INFO,
 
-    async run(interaction, client) {
+    async run({interaction, client}) {
         const find = await client.redis.get("help-embed-data")
         if (find) {
             interaction.editReply({

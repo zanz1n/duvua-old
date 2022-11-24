@@ -11,7 +11,8 @@ export const command: CommandBase = {
     ephemeral: true,
     needsDefer: false,
     category: CommandBaseCategory.INFO,
-    async run(interaction, client) {
+    
+    async run({interaction, client}) {
         const embed = new sEmbed()
             .setDescription(`**Pong!**\nPing do bot: ${client.ws.ping}`)
 
