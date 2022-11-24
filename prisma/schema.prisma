@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model Member {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  MCID          String    @db.VarChar(48) @unique
+  silverCoins   BigInt    @default(0)
+  XP            BigInt    @default(0)
+  level         BigInt    @default(0)
+  dj            Boolean   @default(false)
+  playAllowed   Boolean   @default(false)
+
+  guild         Guild     @relation(fields: [guildId], references: [dcId])
+  guildId       String    @db.VarChar(24)
+
+  tickets       Ticket[]
+
+  user          User      @relation(fields: [userId], references: [dcId])
+  userId        String    @db.VarChar(24)
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now() )
+  updatedAt     DateTime  @updatedAt
+
+  dcId          String    @db.VarChar(24) @unique
+  lastDailyReq  BigInt 
+  job           MemberJob @default(MENDIGO)
+  goldCoins     BigInt    @default(0)
+
+  members       Member[]
+}
+
+model Guild {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  dcId          String    @unique @db.VarChar(24)
+  prefix        String    @db.VarChar(4) @default("-")
+  enableTickets Boolean   @default(true)
+  musicStrictM  Boolean   @default(false)
+
+  welcome       Welcome?
+  tickets       Ticket[]
+  members       Member[]
+}
+
+model Welcome {
+  id            Int       @id @default(autoincrement())
+
+  enabled       Boolean   @default(false)
+  channelId     String?   @db.VarChar(24)
+  message       String    @db.VarChar(255) @default("Seja Bem Vind@ ao servidor")
+  type          WCType    @default(MESSAGE)
+
+  guild         Guild     @relation(fields: [guildId], references: [dcId])
+  guildId       String    @unique
+}
+
+model Ticket {
+  id            Int       @id @default(autoincrement())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  
+
+  guild         Guild     @relation(fields: [guildId], references: [dcId])
+  guildId       String
+
+  member        Member    @relation(fields: [memberId], references: [id])
+  memberId      Int
+}
+
+enum MemberJob {
+  MENDIGO
+}
+
+enum WCType {
+  MESSAGE
+  IMAGE
+  EMBED
+}

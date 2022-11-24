@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  nodejs:
+    container_name: nodejs
+    build:
+      context: ./docker
+      dockerfile: nodejs.dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:/server
+    networks:
+      - botjs
+    depends_on:
+      - postgresql
+      - redisdb
+    environment:
+      DEBUG: "bot*"
+
+  postgresql:
+    container_name: postgresql
+    image: postgres:alpine
+    volumes:
+      - ./.docker-volumes/postgres/:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - botjs
+    ports:
+      - 25432:5432
+
+  redisdb:
+    container_name: redisdb
+    image: redis:alpine
+    command: redis-server --appendonly yes  --requirepass "${F_REDIS_PASSWORD}"
+    networks:
+      - botjs
+    env_file:
+      - .env
+    ports:
+      - 26379:6379
+
+networks:
+  botjs:
+    driver: bridge
