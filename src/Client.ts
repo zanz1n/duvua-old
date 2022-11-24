@@ -1,13 +1,13 @@
-import { Client, GatewayIntentBits } from "discord.js";
-import { CommandBase } from "./types/commandBase";
-import { eventBase } from "./types/eventBase";
-import { commands as commandsData } from "./modules/loadCommandsData";
-import { Dba } from "./db";
-import { sEmbed } from "./types/discord/sEmbed";
+import { Client, GatewayIntentBits } from "discord.js"
+import { CommandBase } from "./types/commandBase"
+import { eventBase } from "./types/eventBase"
+import { commands as commandsData } from "./modules/loadCommandsData"
+import { Dba } from "./db"
+import { sEmbed } from "./types/discord/sEmbed"
 
-import { event as interactionCreateEvent } from "./events/interactionCreate";
-import { event as readyEvent } from "./events/ready";
-import { redisClient } from "./redis";
+import { event as interactionCreateEvent } from "./events/interactionCreate"
+import { event as readyEvent } from "./events/ready"
+import { redisClient } from "./redis"
 
 export class Duvua extends Client {
     commands: CommandBase[] = []
@@ -47,4 +47,6 @@ export class Duvua extends Client {
             await readyEvent.run(this)
         })
     }
+
+    random = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min)
 }
