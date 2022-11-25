@@ -1,15 +1,30 @@
 version: '3.7'
 
 services:
+  # nodejs:
+  #   container_name: nodejs
+  #   build:
+  #     context: ./docker/dev
+  #     dockerfile: nodejs.dockerfile
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./:/server
+  #   networks:
+  #     - botjs
+  #   depends_on:
+  #     - postgresql
+  #     - redisdb
+  #   environment:
+  #     DEBUG: "bot*"
+
   nodejs:
     container_name: nodejs
     build:
-      context: ./docker
-      dockerfile: nodejs.dockerfile
+      context: .
+      dockerfile: ./docker/duvuabot.dockerfile
     env_file:
       - .env
-    volumes:
-      - ./:/server
     networks:
       - botjs
     depends_on:
