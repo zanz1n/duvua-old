@@ -233,12 +233,12 @@ export class Dba {
 }
 
 async function main() {
-    logger.info("")
+    await prisma.guild.findMany()
 }
 
 main()
     .then(async () => {
-        await prisma.$disconnect()
+        logger.info("Postgres connection : OK")
     })
     .catch(async (e) => {
         logger.error("Prisma error: " + e)
