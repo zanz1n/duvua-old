@@ -14,7 +14,7 @@ async function main() {
     client.on("error", (err) => {
         logger.error(`Redis Error: ${err}`)
     })
-    logger.info("redis auth : " + await client.auth(config.redis.password))
+    logger.info("Redis connection : " + await client.auth(config.redis.password))
 }
 
 main()
