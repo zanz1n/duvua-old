@@ -8,5 +8,6 @@ mkdir .docker-volumes/postgres
 sudo rm -rf .docker-volumes/redis
 mkdir .docker-volumes/redis
 
+sudo rm -r node_modules
 sudo chown -R izanr:izanr ./
 yarn
