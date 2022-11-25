@@ -13,9 +13,9 @@ export function loadCommands() {
         const commands = readdirSync(`${path}/${group}`)
             .filter(file => file.endsWith(".ts") || file.endsWith(".js"))
         for (const command of commands) {
-            import(`${path}/${group}/${command}`).then((cmd) => {
-                if (cmd && cmd.command && cmd.command.enabled) slashCommands.push(cmd.command)
-            })
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const cmd = require(`${path}/${group}/${command}`)
+            if (cmd && cmd.command && cmd.command.enabled) slashCommands.push(cmd.command)
         }
     }
     return slashCommands
