@@ -64,8 +64,7 @@ CREATE TABLE "Ticket" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "guildId" TEXT NOT NULL,
-    "memberId" INTEGER NOT NULL,
+    "memberId" TEXT NOT NULL,
 
     CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
 );
@@ -82,6 +81,9 @@ CREATE UNIQUE INDEX "Guild_dcId_key" ON "Guild"("dcId");
 -- CreateIndex
 CREATE UNIQUE INDEX "Welcome_guildId_key" ON "Welcome"("guildId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Ticket_memberId_key" ON "Ticket"("memberId");
+
 -- AddForeignKey
 ALTER TABLE "Member" ADD CONSTRAINT "Member_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -92,7 +94,4 @@ ALTER TABLE "Member" ADD CONSTRAINT "Member_userId_fkey" FOREIGN KEY ("userId") 
 ALTER TABLE "Welcome" ADD CONSTRAINT "Welcome_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("MCID") ON DELETE RESTRICT ON UPDATE CASCADE;
