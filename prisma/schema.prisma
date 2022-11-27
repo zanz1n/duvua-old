@@ -75,6 +75,7 @@ model Ticket {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  enabled       Boolean
   member        Member    @relation(fields: [memberId], references: [MCID])
   memberId      String    @unique
 }
