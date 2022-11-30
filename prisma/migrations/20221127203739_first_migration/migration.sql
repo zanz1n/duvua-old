@@ -64,6 +64,7 @@ CREATE TABLE "Ticket" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "channelId" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL,
     "memberId" TEXT NOT NULL,
 
@@ -81,6 +82,9 @@ CREATE UNIQUE INDEX "Guild_dcId_key" ON "Guild"("dcId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Welcome_guildId_key" ON "Welcome"("guildId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Ticket_channelId_key" ON "Ticket"("channelId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Ticket_memberId_key" ON "Ticket"("memberId");
