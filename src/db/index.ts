@@ -5,11 +5,17 @@ import {
 import {
     Guild as GuildData,
     GuildMember,
+    TextBasedChannel,
     User as UserData
 } from "discord.js"
 import { logger } from "../modules/logger"
 
 const prisma = new PrismaClient()
+
+type ticketCreateOptions = {
+    channel: TextBasedChannel
+    member: GuildMember
+}
 
 class GuildDb {
     public async getFromGuild(guild: GuildData) {
@@ -226,10 +232,144 @@ class UserDb {
     }
 }
 
+class TicketDb {
+    public async getFromMember(member: GuildMember) {
+        return await prisma.ticket.findFirst({
+            where: {
+                memberId: `${member.guild.id}${member.user.id}`
+            }
+        }).then((result) => {
+            return result
+        }).catch(() => {
+            return null
+        })
+    }
+
+    public async updateFromMember(member: GuildMember, data: Prisma.TicketUpdateInput) {
+        return await prisma.ticket.update({
+            where: {
+                memberId: `${member.guild.id}${member.user.id}`
+            },
+            data
+        }).then((result) => {
+            return result
+        }).catch(() => {
+            return null
+        })
+    }
+
+    public async createFromOptions(options: ticketCreateOptions, data?: Prisma.TicketUpdateInput) {
+        if (data) {
+            return await prisma.ticket.create({
+                data: {
+                    channelId: options.channel.id,
+                    member: {
+                        connectOrCreate: {
+                            create: {
+                                MCID: `${options.member.guild.id}${options.member.user.id}`,
+                                guild: {
+                                    connectOrCreate: {
+                                        create: {
+                                            dcId: options.member.guild.id
+                                        },
+                                        where: {
+                                            dcId: options.member.guild.id
+                                        }
+                                    }
+                                },
+                                user: {
+                                    connectOrCreate: {
+                                        create: {
+                                            dcId: options.member.user.id,
+                                            lastDailyReq: Date.now()
+                                        },
+                                        where: {
+                                            dcId: options.member.user.id
+                                        }
+                                    }
+                                }
+                            },
+                            where: {
+                                MCID: `${options.member.guild.id}${options.member.user.id}`
+                            }
+                        }
+                    },
+                    enabled: false
+                }
+            }).then(async () => {
+                return await this.updateFromMember(options.member, data)
+            }).catch(() => {
+                return null
+            })
+        }
+        return await prisma.ticket.create({
+            data: {
+                channelId: options.channel.id,
+                member: {
+                    connectOrCreate: {
+                        create: {
+                            MCID: `${options.member.guild.id}${options.member.user.id}`,
+                            guild: {
+                                connectOrCreate: {
+                                    create: {
+                                        dcId: options.member.guild.id
+                                    },
+                                    where: {
+                                        dcId: options.member.guild.id
+                                    }
+                                }
+                            },
+                            user: {
+                                connectOrCreate: {
+                                    create: {
+                                        dcId: options.member.user.id,
+                                        lastDailyReq: Date.now()
+                                    },
+                                    where: {
+                                        dcId: options.member.user.id
+                                    }
+                                }
+                            }
+                        },
+                        where: {
+                            MCID: `${options.member.guild.id}${options.member.user.id}`
+                        }
+                    }
+                },
+                enabled: false
+            }
+        }).then((result) => {
+            return result
+        }).catch(() => {
+            return null
+        })
+    }
+
+    public async getOrCreateFromOptions(options: ticketCreateOptions) {
+        const find = await this.getFromMember(options.member)
+        if (find) return find
+
+        return this.createFromOptions(options)
+    }
+
+    public async deleteFromMember(member: GuildMember) {
+        return await prisma.ticket.delete({
+            where: {
+                memberId: `${member.guild.id}${member.user.id}`
+            }
+        }).then((result) => {
+            return result
+        }).catch(() => {
+            return null
+        })
+    }
+}
+
 export class Dba {
     public guild = new GuildDb
     public member = new MemebrDb
     public user = new UserDb
+    public ticket = new TicketDb
 }
 
 async function main() {
