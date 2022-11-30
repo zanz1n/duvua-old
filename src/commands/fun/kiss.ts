@@ -91,8 +91,6 @@ export const command: CommandBase = {
 
         collector.on("collect", async (i) => {
             if (i.customId === `repeat${dateNow}`) {
-                interaction.editReply({ components: [row] })
-
                 const embedRetribuir = new sEmbed().setTitle("As coisas estão pegando fogo aqui!  :fire:")
                     .setDescription(`${i.user} retribuiu o beijo de ${interaction.user}\nSerá que temos um novo casal aqui?  :heart:`)
                     .setImage(gifs_kiss[client.random(0, gifs_kiss.length)])
@@ -100,8 +98,6 @@ export const command: CommandBase = {
                 await i.reply({ embeds: [embedRetribuir] })
             }
             else if (i.customId === `reject${dateNow}`) {
-                interaction.editReply({ components: [row] })
-
                 const embedRetribuir = new sEmbed().setTitle(`Quem nunca levou um fora, né ${interaction.user.username}`)
                     .setDescription(`${i.user} negou o beijo de ${interaction.user}  :broken_heart:`)
                     .setImage(gifs_slap[client.random(0, gifs_slap.length)])
@@ -115,6 +111,7 @@ export const command: CommandBase = {
             reject.setDisabled(true)
             repeat.setDisabled(true)
             reject.setDisabled(true)
+            await interaction.editReply({ components: [row] })
         })
     }
 }
