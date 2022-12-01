@@ -7,4 +7,4 @@ COPY ./docker/Lavalink.jar /server/Lavalink.jar
 
 EXPOSE 2333
 
-CMD java -Xmx1024M -Xms128M -jar Lavalink.jar
+CMD java -Xmx${LAVALINK_MAX_MEMORY} -Xms${LAVALINK_MIN_MEMORY} -jar Lavalink.jar
