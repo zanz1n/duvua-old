@@ -9,4 +9,4 @@ COPY ./prisma/ /server/prisma
 
 RUN yarn install
 
-CMD ls -la /server/ && node dist/index.js
+CMD yarn db-migrate && node dist/index.js
