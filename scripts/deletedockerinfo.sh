@@ -9,5 +9,5 @@ sudo rm -rf .docker-volumes/redis
 mkdir .docker-volumes/redis
 
 sudo rm -r node_modules
-sudo chown -R izanr:izanr ./
+sudo chown -R $USER:$USER ./
 yarn

@@ -1,3 +1,3 @@
 docker-compose down;
 docker-compose up;
-sudo chown -R izanr:izanr ./
+sudo chown -R $USER:$USER ./
