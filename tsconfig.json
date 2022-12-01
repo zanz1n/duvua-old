@@ -3,21 +3,15 @@
     "lib": [
       "ESNext"
     ],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES6",
     "outDir": "dist",
     "strict": true,
     "sourceMap": true,
-    "esModuleInterop": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
-    "importHelpers": true
   },
   "include": [
     "src/**/*.ts"
