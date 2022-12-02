@@ -4,6 +4,7 @@ import { sEmbed } from "../../types/discord/sEmbed"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
 import { gifs_kiss, gifs_slap } from "../../utils/gifs"
+import { random } from "../../modules/random"
 
 export const command: CommandBase = {
     data: {
@@ -37,22 +38,22 @@ export const command: CommandBase = {
             return
         }
 
-        // else if (user == interaction.user) {
-        //     embed.setTitle("O amor está no ar!  :heart:")
-        //         .setDescription(`${interaction.user} beijou ${user}`)
-        //         .setImage(gifs_kiss[client.random(0, gifs_kiss.length)])
-        //         .setFooter({
-        //             text: "Amar a si mesmo é bom!",
-        //         })
-        //     await interaction.editReply({ embeds: [embed] })
-        //     return
-        // }
+        else if (user == interaction.user) {
+            embed.setTitle("O amor está no ar!  :heart:")
+                .setDescription(`${interaction.user} beijou ${user}`)
+                .setImage(gifs_kiss[random(0, gifs_kiss.length)])
+                .setFooter({
+                    text: "Amar a si mesmo é bom!",
+                })
+            await interaction.editReply({ embeds: [embed] })
+            return
+        }
 
         const dateNow = Date.now()
 
         embed.setTitle("O amor está no ar!  :heart:")
             .setDescription(`${interaction.user} beijou ${user}`)
-            .setImage(gifs_kiss[client.random(0, gifs_kiss.length)])
+            .setImage(gifs_kiss[random(0, gifs_kiss.length)])
             .setFooter({
                 text: `Requisitado por ${interaction.user.username}`,
                 iconURL: interaction.user.displayAvatarURL({
@@ -93,14 +94,14 @@ export const command: CommandBase = {
             if (i.customId === `repeat${dateNow}`) {
                 const embedRetribuir = new sEmbed().setTitle("As coisas estão pegando fogo aqui!  :fire:")
                     .setDescription(`${i.user} retribuiu o beijo de ${interaction.user}\nSerá que temos um novo casal aqui?  :heart:`)
-                    .setImage(gifs_kiss[client.random(0, gifs_kiss.length)])
+                    .setImage(gifs_kiss[random(0, gifs_kiss.length)])
 
                 await i.reply({ embeds: [embedRetribuir] })
             }
             else if (i.customId === `reject${dateNow}`) {
                 const embedRetribuir = new sEmbed().setTitle(`Quem nunca levou um fora, né ${interaction.user.username}`)
                     .setDescription(`${i.user} negou o beijo de ${interaction.user}  :broken_heart:`)
-                    .setImage(gifs_slap[client.random(0, gifs_slap.length)])
+                    .setImage(gifs_slap[random(0, gifs_slap.length)])
 
                 await i.reply({ embeds: [embedRetribuir] })
             }

@@ -1,13 +1,14 @@
+import { Events } from "discord.js"
 import { Duvua } from "../Client"
 import { logger } from "../modules/logger"
 import { postSlashCommands } from "../modules/postSlashCommands"
-import { eventBase } from "../types/eventBase"
+import { EventBase } from "../types/eventBase"
 
-export const event: eventBase = {
-    name: "ready",
+export const event: EventBase = {
+    name: Events.ClientReady,
     enabled: true,
     async run(client: Duvua) {
         postSlashCommands(client)
-        logger.info(`Discord websocket connected | Online in ${(await client.guilds.fetch()).size} guilds`)
+        logger.info(`Discord websocket connected | Online in ${(client.guilds.cache).size} guilds`)
     }
 }

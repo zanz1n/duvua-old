@@ -1,6 +1,8 @@
-export type eventBase = {
-    name: string
+import { Events } from "discord.js"
+
+export type EventBase = {
+    name: Events
     enabled: boolean
     // eslint-disable-next-line @typescript-eslint/ban-types
-    run: Function
+    run: (...args: any) => Promise<void>
 }

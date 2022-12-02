@@ -1,17 +1,21 @@
-import { Client, GatewayIntentBits } from "discord.js"
-import { CommandBase } from "./types/commandBase"
-import { eventBase } from "./types/eventBase"
+import { Client, Events, GatewayIntentBits } from "discord.js"
+import { EventBase } from "./types/eventBase"
 import { commands as commandsData } from "./modules/loadCommandsData"
 import { Dba } from "./db"
 import { sEmbed } from "./types/discord/sEmbed"
 
-import { event as interactionCreateEvent } from "./events/interactionCreate"
-import { event as readyEvent } from "./events/ready"
 import { redisClient } from "./redis"
+// import { config } from "./config"
+// import { Node } from "lavaclient"
+import { eventsData } from "./modules/loadEvents"
+import { CommandBase } from "./types/commandBase"
 
 export class Duvua extends Client {
-    commands: CommandBase[] = []
-    events: eventBase[] = []
+    commands: CommandBase[] = commandsData
+
+    events: EventBase[] = eventsData
+
+    // player: Node
 
     dba = new Dba
 
@@ -26,27 +30,31 @@ export class Duvua extends Client {
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMembers,
-                GatewayIntentBits.GuildBans
+                GatewayIntentBits.GuildBans,
+                GatewayIntentBits.GuildVoiceStates
             ]
         })
+        // this.player = new Node({
+        //     connection: {
+        //         host: config.lavalink.host,
+        //         password: config.lavalink.password,
+        //         port: config.lavalink.port
+        //     },
+        //     sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard.send(payload)
+        // })
         this._token = token
         this.init()
     }
 
     async init() {
-        this.commands = commandsData
-        this.loadEvents()
         this.login(this._token)
+        this.listenForEvents()
     }
 
-    async loadEvents() {
-        this.on(interactionCreateEvent.name, async (interatction) => {
-            await interactionCreateEvent.run(interatction, this)
-        })
-        this.on(readyEvent.name, async () => {
-            await readyEvent.run(this)
-        })
+    async listenForEvents() {
+        for (const event of this.events) {
+            if (event.name == Events.InteractionCreate) this.on(event.name, async (interaction) => event.run(interaction, this))
+            else if (event.name == Events.ClientReady) this.on(event.name, async () => event.run(this))
+        }
     }
-
-    random = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min)
 }
