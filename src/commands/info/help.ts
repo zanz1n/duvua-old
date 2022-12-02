@@ -20,15 +20,17 @@ export const command: CommandBase = {
             })
             return
         }
+
         const helpEmbed = new sEmbed()
             .setTitle("Help")
-        for (const command of client.commands) {
+        client.commands.forEach((command) => {
             helpEmbed.addFields({
                 name: command.data.name,
                 value: command.data.description,
                 inline: true
             })
-        }
+        })
+        
         interaction.editReply({
             content: null,
             embeds: [helpEmbed]

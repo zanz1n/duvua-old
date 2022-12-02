@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from "discord.js"
+import { Client, Collection, Events, GatewayIntentBits, Options } from "discord.js"
 import { EventBase } from "./types/eventBase"
 import { commands as commandsData } from "./modules/loadCommandsData"
 import { Dba } from "./db"
@@ -11,7 +11,7 @@ import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
 
 export class Duvua extends Client {
-    commands: CommandBase[] = commandsData
+    commands: Collection<string, CommandBase> = commandsData
 
     events: EventBase[] = eventsData
 
@@ -32,7 +32,13 @@ export class Duvua extends Client {
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.GuildBans,
                 GatewayIntentBits.GuildVoiceStates
-            ]
+            ],
+            // sweepers: {
+            //     ...Options.DefaultSweeperSettings
+            // },
+            // makeCache: Options.cacheWithLimits({
+            //     ...Options.DefaultMakeCacheSettings,
+            // })
         })
         // this.player = new Node({
         //     connection: {

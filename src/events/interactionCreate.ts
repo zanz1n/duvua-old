@@ -16,12 +16,12 @@ export const event: EventBase = {
             // if (interaction.guild) client.dba.guild.getOrCreateFromGuild(interaction.guild)
             // client.dba.user.getOrCreateFromUser(interaction.user)
     
-            const cmd = client.commands.find(c => c.data.name == interaction.commandName)
+            const cmd = client.commands.get(interaction.commandName)
             if (!cmd) return
     
             if (cmd.needsDefer) await interaction.deferReply({ ephemeral: cmd.ephemeral })
     
-            cmd.run({ interaction: interaction as sInteraction, client })
+            cmd.run({ interaction: interaction as sInteraction, client }).catch((e) => logger.error(e))
         }
     }
 }

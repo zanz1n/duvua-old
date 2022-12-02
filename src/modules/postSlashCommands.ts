@@ -15,7 +15,7 @@ export async function postSlashCommands(client: Duvua) {
                 Routes.applicationCommands(client.application.id), {
                     body: commandsData
                 }).then(() => {
-                logger.info(`${commandsData.length} commands sucessfully registered`)
+                logger.info(`${commandsData.size} commands sucessfully registered`)
             })
         } catch (e) {
             logger.error(`Failed to register commands: ${e}`)
