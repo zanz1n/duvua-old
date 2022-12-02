@@ -8,7 +8,7 @@
     "build": "tsc",
     "prod": "node dist/index.js",
     "dev-start": "sucrase-node src/index.ts",
-    "dev": "nodemon",
+    "dev": "ts-node-dev src/index.ts",
     "watch": "tsc -w"
   },
   "license": "MIT",
@@ -25,7 +25,6 @@
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "eslint": "^8.28.0",
-    "nodemon": "^2.0.20",
     "prisma": "^4.6.1",
     "sucrase": "^3.29.0",
     "ts-node": "^10.9.1",
