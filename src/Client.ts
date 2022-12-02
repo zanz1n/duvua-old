@@ -33,12 +33,12 @@ export class Duvua extends Client {
                 GatewayIntentBits.GuildBans,
                 GatewayIntentBits.GuildVoiceStates
             ],
-            // sweepers: {
-            //     ...Options.DefaultSweeperSettings
-            // },
-            // makeCache: Options.cacheWithLimits({
-            //     ...Options.DefaultMakeCacheSettings,
-            // })
+            sweepers: {
+                ...Options.DefaultSweeperSettings
+            },
+            makeCache: Options.cacheWithLimits({
+                ...Options.DefaultMakeCacheSettings,
+            })
         })
         // this.player = new Node({
         //     connection: {
