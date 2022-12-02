@@ -45,10 +45,9 @@ class GuildDb {
                 data: {
                     dcId: guild.id,
                 }
-            }).then(async () => {
-                return await this.updateFromGuild(guild, data)
-            }).catch(() => {
-                return null
+            }).then(async (data) => {
+                await this.updateFromGuild(guild, data)
+                return data
             })
         }
         return await prisma.guild.create({
@@ -68,8 +67,6 @@ class GuildDb {
             }
         }).then((result) => {
             return result
-        }).catch(() => {
-            return null
         })
     }
 
@@ -131,8 +128,6 @@ class MemebrDb {
                 }
             }).then(async () => {
                 return await this.updateFromMember(member, data)
-            }).catch(() => {
-                return null
             })
         }
         return await prisma.member.create({
@@ -162,8 +157,6 @@ class MemebrDb {
             }
         }).then((info) => {
             return info
-        }).catch(() => {
-            return null
         })
     }
 
@@ -219,8 +212,6 @@ class UserDb {
             }
         }).then((result) => {
             return result
-        }).catch(() => {
-            return null
         })
     }
 
@@ -298,8 +289,6 @@ class TicketDb {
                 }
             }).then(async () => {
                 return await this.updateFromMember(options.member, data)
-            }).catch(() => {
-                return null
             })
         }
         return await prisma.ticket.create({
@@ -340,8 +329,6 @@ class TicketDb {
             }
         }).then((result) => {
             return result
-        }).catch(() => {
-            return null
         })
     }
 
