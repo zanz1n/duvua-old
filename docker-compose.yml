@@ -61,8 +61,8 @@ services:
   lavalink:
     container_name: lavalink
     build:
-      context: .
-      dockerfile: ./docker/lavalink.dockerfile
+      context: ./docker/
+      dockerfile: lavalink.dockerfile
     networks:
       - botjs
     env_file:
