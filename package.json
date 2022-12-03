@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "zanz1n",
+  "type": "commonjs",
   "scripts": {
     "db-migrate": "prisma db push",
     "build": "tsc",
@@ -13,6 +14,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@lavaclient/queue": "^2.1.1",
+    "@lavaclient/spotify": "^3.1.0",
     "@prisma/client": "^4.6.1",
     "debug": "^4.3.4",
     "discord.js": "^14.6.0",
