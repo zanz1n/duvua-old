@@ -9,6 +9,6 @@ export const event: EventBase = {
     enabled: true,
     async run(client: Duvua) {
         postSlashCommands(client)
-        logger.info(`Discord websocket connected | Online in ${(client.guilds.cache).size} guilds`)
+        logger.info(`Discord websocket connected | Online in ${(await client.guilds.fetch()).size} guilds`)
     }
 }
