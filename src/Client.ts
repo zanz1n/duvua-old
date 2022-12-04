@@ -1,12 +1,19 @@
-import { Client, Collection, Events, GatewayIntentBits, Options } from "discord.js"
+import {
+    Client,
+    Collection,
+    Events,
+    GatewayDispatchEvents,
+    GatewayIntentBits,
+    Options
+} from "discord.js"
 import { EventBase } from "./types/eventBase"
 import { commands as commandsData } from "./modules/loadCommandsData"
 import { Dba } from "./db"
 import { sEmbed } from "./types/discord/sEmbed"
 
 import { redisClient } from "./redis"
-// import { config } from "./config"
-// import { Node } from "lavaclient"
+import { config } from "./config"
+import { Node } from "lavaclient"
 import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
 
@@ -15,7 +22,7 @@ export class Duvua extends Client {
 
     events: EventBase[] = eventsData
 
-    // player: Node
+    music: Node
 
     dba = new Dba
 
@@ -40,14 +47,14 @@ export class Duvua extends Client {
                 ...Options.DefaultMakeCacheSettings,
             })
         })
-        // this.player = new Node({
-        //     connection: {
-        //         host: config.lavalink.host,
-        //         password: config.lavalink.password,
-        //         port: config.lavalink.port
-        //     },
-        //     sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard.send(payload)
-        // })
+        this.music = new Node({
+            connection: {
+                host: config.lavalink.host,
+                password: config.lavalink.password,
+                port: config.lavalink.port
+            },
+            sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard.send(payload)
+        })
         this._token = token
         this.init()
     }
@@ -62,5 +69,7 @@ export class Duvua extends Client {
             if (event.name == Events.InteractionCreate) this.on(event.name, async (interaction) => event.run(interaction, this))
             else if (event.name == Events.ClientReady) this.on(event.name, async () => event.run(this))
         }
+        this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, data => this.music.handleVoiceUpdate(data))
+        this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, data => this.music.handleVoiceUpdate(data))
     }
 }
