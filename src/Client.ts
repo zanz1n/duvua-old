@@ -16,6 +16,7 @@ import { config } from "./config"
 import { Node } from "lavaclient"
 import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
+import { Kitsu } from "./modules/kitsu.io/index"
 
 export class Duvua extends Client {
     commands: Collection<string, CommandBase> = commandsData
@@ -27,6 +28,8 @@ export class Duvua extends Client {
     dba = new Dba
 
     redis = redisClient
+
+    kitsu: Kitsu
     
     staticHelpEmbed?: sEmbed
 
@@ -56,6 +59,7 @@ export class Duvua extends Client {
             sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard.send(payload)
         })
         this._token = token
+        this.kitsu = new Kitsu(this.redis)
         this.init()
     }
 
