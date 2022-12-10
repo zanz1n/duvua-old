@@ -1,6 +1,6 @@
 import { Redis } from "ioredis"
 import {
-    AnimeRelationshipGenresResponse
+    AnimeRelationshipGenresResponse, AnimeRelationshipGenresResponseData
 } from "./types/animeGenresApiData"
 import {
     AnimeSearchResponse,
@@ -15,10 +15,14 @@ import {
     AnimeSearchResponseDataAttributesTitles
 } from "./types/animeSearchApiData"
 import { Translator } from "../translator/index"
+import { logger } from "../logger"
+
+interface AnimeRedisCache {
+    data: AnimeSearchResponse,
+    genresData: AnimeRelationshipGenresResponse
+}
 
 export class Anime implements AnimeSearchResponseDataAttributes {
-    private _data: AnimeSearchResponseData
-
     createdAt: string
     updatedAt: string
     slug: string
@@ -40,27 +44,21 @@ export class Anime implements AnimeSearchResponseDataAttributes {
     subtype: AnimeSearchResponseDataAttributesSubType
     status: AnimeSearchResponseDataAttributesStatus
     tba: string
-    posterImage: AnimeSearchResponseDataAttributesPosterImage
-    coverImage: AnimeSearchResponseDataAttributesCoverImage
+    posterImage: AnimeSearchResponseDataAttributesPosterImage | null
+    coverImage: AnimeSearchResponseDataAttributesCoverImage | null
     episodeCount: number
     episodeLength: number
-    youtubeVideoId: string
+    youtubeVideoId: string | null
     showType: AnimeSearchResponseDataAttributesSubType
     nsfw: boolean
-    
-    public getGenres(): Promise<string[] | null> {
-        return fetch(this._data.relationships.genres.links.related)
-            .then(res => res.json())
-            .then((data: AnimeRelationshipGenresResponse) => {
-                if (!data.data[0]) return null
-                const genres: string[] = []
-                data.data.forEach(attr => genres.push(attr.attributes.name))
-                return genres
-            })
-        
-    }
-    constructor(data: AnimeSearchResponse) {
-        this._data = data.data[0]
+    genres: string[] | null
+
+    constructor(data: AnimeSearchResponse, genresData: AnimeRelationshipGenresResponse) {
+        if (!genresData.data[0]) this.genres = null
+        const genres: string[] = []
+        genresData.data.forEach(attr => genres.push(attr.attributes.name))
+        this.genres = genres
+
         this.createdAt = data.data[0].attributes.createdAt
         this.updatedAt = data.data[0].attributes.updatedAt
         this.slug = data.data[0].attributes.slug
@@ -106,22 +104,24 @@ export class Kitsu {
         const cache = await this.redis.get(nameQuery)
 
         if (cache) {
-            const cacheData = JSON.parse(cache) as AnimeSearchResponse
-            return new Anime(cacheData)
+            const cacheData = JSON.parse(cache) as Anime
+            return cacheData
         }
+
+        const data = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${nameQuery}`)
+            .then(res => res.json()) as AnimeSearchResponse
+        if (!data.data[0]) return null
+
+        const genresData = await fetch(data.data[0].relationships.genres.links.related)
+            .then(res => res.json()) as AnimeRelationshipGenresResponse
     
-        return fetch(`https://kitsu.io/api/edge/anime?filter[text]=${nameQuery}`)
-            .then(res => res.json())
-            .then(async (data) => {
-                const dataAs = data as AnimeSearchResponse
-                dataAs.data[0].attributes.synopsis =
-                    await this.translator.translate(dataAs.data[0].attributes.synopsis, {
-                        from: "en",
-                        to: "pt"
-                    })
-                this.redis.set(nameQuery, JSON.stringify(dataAs))
-                if (!dataAs.data[0]) return null
-                return new Anime(dataAs)
-            }).catch(() => null)
+        data.data[0].attributes.synopsis = 
+            await this.translator.translate(data.data[0].attributes.synopsis, {
+                from: "en",
+                to: "pt"
+            })
+        const anime = new Anime(data, genresData)
+        this.redis.set(nameQuery, JSON.stringify(anime))
+        return anime
     }
 }

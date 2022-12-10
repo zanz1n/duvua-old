@@ -98,11 +98,11 @@ export interface AnimeSearchResponseDataAttributes {
     subtype: AnimeSearchResponseDataAttributesSubType
     status: AnimeSearchResponseDataAttributesStatus
     tba: string
-    posterImage: AnimeSearchResponseDataAttributesPosterImage
-    coverImage: AnimeSearchResponseDataAttributesCoverImage
+    posterImage: AnimeSearchResponseDataAttributesPosterImage | null
+    coverImage: AnimeSearchResponseDataAttributesCoverImage | null
     episodeCount: number
     episodeLength: number
-    youtubeVideoId: string
+    youtubeVideoId: string | null
     showType: AnimeSearchResponseDataAttributesSubType
     nsfw: boolean
 }
