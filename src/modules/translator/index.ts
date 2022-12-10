@@ -119,7 +119,7 @@ export type TranslatorOptions = {
 }
 
 export class Translator {
-    async translate(text: string, options: TranslatorOptions) {
+    async translate(text: string, options: TranslatorOptions): Promise<string> {
         const baseUrl = "https://translate.google.com/translate_a/single"
         const token = await generate(text)
         const data = {
@@ -139,7 +139,6 @@ export class Translator {
         }
         
         const url = `${baseUrl}?${querryString.stringify(data)}`
-        console.log(url)
         return fetch(url, {
             method: "POST"
         })
