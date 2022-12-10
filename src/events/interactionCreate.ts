@@ -10,6 +10,7 @@ export const event: EventBase = {
 
     async run(interaction: Interaction, client: Duvua) {
         if (interaction.isCommand()) {
+            const dateStart = Date.now()
             if (!(interaction.member instanceof GuildMember)) return
 
             // if (interaction.member instanceof GuildMember) client.dba.member.getOrCreateFromMember(interaction.member)
@@ -21,7 +22,8 @@ export const event: EventBase = {
     
             if (cmd.needsDefer) await interaction.deferReply({ ephemeral: cmd.ephemeral })
     
-            cmd.run({ interaction: interaction as sInteraction, client }).catch((e) => logger.error(e))
+            await cmd.run({ interaction: interaction as sInteraction, client }).catch(e => logger.error(e))
+            logger.debug(`[commandTimer] - ${cmd.data.name}: ${Date.now() - dateStart}ms`)
         }
     }
 }
