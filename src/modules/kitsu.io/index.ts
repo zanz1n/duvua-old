@@ -14,6 +14,7 @@ import {
     AnimeSearchResponseDataAttributesSubType,
     AnimeSearchResponseDataAttributesTitles
 } from "./types/animeSearchApiData"
+import { Translator } from "../translator/index"
 
 export class Anime implements AnimeSearchResponseDataAttributes {
     private _data: AnimeSearchResponseData
@@ -93,8 +94,10 @@ export class Anime implements AnimeSearchResponseDataAttributes {
 
 export class Kitsu {
     redis: Redis
-    constructor(redis: Redis) {
+    translator: Translator
+    constructor(redis: Redis, translator: Translator) {
         this.redis = redis
+        this.translator = translator
     }
 
     public getAnimeFromName = async (name: string) => {
@@ -111,6 +114,11 @@ export class Kitsu {
             .then(res => res.json())
             .then(async (data) => {
                 const dataAs = data as AnimeSearchResponse
+                dataAs.data[0].attributes.synopsis =
+                    await this.translator.translate(dataAs.data[0].attributes.synopsis, {
+                        from: "en",
+                        to: "pt"
+                    })
                 this.redis.set(nameQuery, JSON.stringify(dataAs))
                 if (!dataAs.data[0]) return null
                 return new Anime(dataAs)
