@@ -86,10 +86,8 @@ const window = {
 // }
 
 // eslint-disable-next-line require-jsdoc
-async function generate(text) {
+export async function generate(text) {
     let tk = zr(text)
     tk = tk.replace("&tk=", "")
     return { name: "tk", value: tk }
 }
-
-module.exports.generate = generate

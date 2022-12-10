@@ -1,10 +1,8 @@
 import querryString from "querystring"
+import { logger } from "../logger"
 
-interface generateTokenNamespaceType { generate(text: string): { name: string, value: string } }
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const generateTokenNamespace = require("./generateToken.js") as generateTokenNamespaceType
-
-const { generate } = generateTokenNamespace
+// interface generateTokenNamespaceType { generate(text: string): { name: string, value: string } }
+import { generate } from "./generateToken.js"
 
 export type isoLanguage = 
     "auto"    |
@@ -137,14 +135,18 @@ export class Translator {
             q: text,
             [token.name]: token.value
         }
-        
+        let textResult = ""
         const url = `${baseUrl}?${querryString.stringify(data)}`
-        return fetch(url, {
+
+        const body = await fetch(url, {
             method: "POST"
+        }).then(res => res.json())
+
+        body[0].forEach((obj: any) => {
+            if (obj[0]) {
+                textResult += obj[0]
+            }
         })
-            .then(res => res.json())
-            .then((data) => {
-                return data[0][0][0] as string
-            })
+        return textResult
     }
 }
