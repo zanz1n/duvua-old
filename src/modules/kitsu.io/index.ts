@@ -4,7 +4,6 @@ import {
 } from "./types/animeGenresApiData"
 import {
     AnimeSearchResponse,
-    AnimeSearchResponseData,
     AnimeSearchResponseDataAttributes,
     AnimeSearchResponseDataAttributesAgeRating,
     AnimeSearchResponseDataAttributesCoverImage,
