@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from "discord.js"
 import { createMentionByUser as men } from "../../modules/createMentionByUser"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
@@ -23,6 +23,7 @@ export const command: CommandBase = {
         ]
     },
     async run({interaction, client}) {
+        if (!interaction.channel) return
         const searchName = interaction.options.getString("name", true)
 
         const embed = new sEmbed()
@@ -48,12 +49,31 @@ export const command: CommandBase = {
             const dateNow = Date.now()
             synopsis = data.synopsis.slice(0, MAX_SYNOPSIS_LENGTH - 40) 
             + " [...] " + data.synopsis.slice(data.synopsis.length - 40, data.synopsis.length)
-            // const button = new sMessageButton()
-            //     .setCustomId(`full-synopsis${dateNow}`)
-            //     .setDisabled(false)
-            //     .setStyle(ButtonStyle.Primary)
-            //     .setLabel("Ver Sinopse Completa")
-            // components.push(new sButtonActionRow().addComponents(button))
+            const button = new sMessageButton()
+                .setCustomId(`full-synopsis${dateNow}`)
+                .setDisabled(false)
+                .setStyle(ButtonStyle.Primary)
+                .setLabel("Ver Sinopse Completa")
+            components.push(new sButtonActionRow().addComponents(button))
+
+            const collector = await interaction.channel.createMessageComponentCollector({
+                componentType: ComponentType.Button,
+                filter: (bntint) => bntint.user.id == interaction.user.id,
+                max: 1,
+                time: 20000
+            })
+
+            collector.on("collect", async (i) => {
+                if (i.customId == `full-synopsis${dateNow}`) {
+                    i.reply(`\`${data.synopsis}\``)
+                }
+            })
+
+            collector.on("end", async () => {
+                button.setDisabled(true)
+                interaction.editReply({ components })
+            })
+
         }
 
         embed.addFields([
