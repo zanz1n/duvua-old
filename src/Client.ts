@@ -11,7 +11,7 @@ import { commands as commandsData } from "./modules/loadCommandsData"
 import { Dba } from "./db"
 import { sEmbed } from "./types/discord/sEmbed"
 
-import { redisClient } from "./redis"
+import { RedisClient } from "./redis"
 import { config } from "./config"
 import { Node } from "lavaclient"
 import { eventsData } from "./modules/loadEvents"
@@ -22,15 +22,15 @@ import { Translator } from "./modules/translator/index"
 export class Duvua extends Client {
     commands: Collection<string, CommandBase> = commandsData
 
-    events: EventBase[] = eventsData
+    events: EventBase[]
 
     music: Node
 
-    dba = new Dba
+    dba: Dba
 
-    redis = redisClient
+    redis: RedisClient
 
-    translator = new Translator()
+    translator: Translator
 
     kitsu: Kitsu
     
@@ -53,6 +53,12 @@ export class Duvua extends Client {
                 ...Options.DefaultMakeCacheSettings,
             })
         })
+
+        this.translator = new Translator()
+        this.events = eventsData
+        this.dba = new Dba()
+        this.redis = new RedisClient()
+
         this.music = new Node({
             connection: {
                 host: config.lavalink.host,
