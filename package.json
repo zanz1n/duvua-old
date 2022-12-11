@@ -1,9 +1,10 @@
 {
-  "name": "discord-mysql",
+  "name": "duvua-bot",
   "version": "1.0.0",
   "main": "index.js",
   "author": "zanz1n",
   "type": "commonjs",
+  "repository": "https://github.com/zanz1n/duvua-bot.git",
   "scripts": {
     "db-migrate": "prisma db push",
     "build": "tsc",
