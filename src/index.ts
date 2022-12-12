@@ -1,7 +1,6 @@
 import { Duvua } from "./Client"
 import { config } from "./config"
 import { logger } from "./modules/logger"
-import "@lavaclient/queue/register"
 
 const TOKEN = config.token
 

@@ -13,18 +13,19 @@ import { sEmbed } from "./types/discord/sEmbed"
 
 import { RedisClient } from "./redis"
 import { config } from "./config"
-import { Node } from "lavaclient"
 import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
 import { Kitsu } from "./modules/kitsu.io/index"
 import { Translator } from "./modules/translator/index"
+import { Shoukaku, Connectors } from "shoukaku"
+import { logger } from "./modules/logger"
 
 export class Duvua extends Client {
     commands: Collection<string, CommandBase> = commandsData
 
     events: EventBase[]
 
-    music: Node
+    music: Shoukaku
 
     dba: Dba
 
@@ -59,14 +60,13 @@ export class Duvua extends Client {
         this.dba = new Dba()
         this.redis = new RedisClient()
 
-        this.music = new Node({
-            connection: {
-                host: config.lavalink.host,
-                password: config.lavalink.password,
-                port: config.lavalink.port
-            },
-            sendGatewayPayload: (id, payload) => this.guilds.cache.get(id)?.shard.send(payload)
-        })
+        this.music = new Shoukaku(new Connectors.DiscordJS(this), [
+            {
+                name: "LocalNode",
+                url: `${config.lavalink.host}:${config.lavalink.port.toString()}`,
+                auth: config.lavalink.password
+            }
+        ])
         this._token = token
         this.kitsu = new Kitsu(this.redis, this.translator)
         this.init()
@@ -82,7 +82,7 @@ export class Duvua extends Client {
             if (event.name == Events.InteractionCreate) this.on(event.name, async (interaction) => event.run(interaction, this))
             else if (event.name == Events.ClientReady) this.on(event.name, async () => event.run(this))
         }
-        this.ws.on(GatewayDispatchEvents.VoiceServerUpdate, data => this.music.handleVoiceUpdate(data))
-        this.ws.on(GatewayDispatchEvents.VoiceStateUpdate, data => this.music.handleVoiceUpdate(data))
+        this.music.on("error", (name, error) => logger.error(`Lavalink ${error.name} error on ${name} - ${error.message}`))
+        this.music.on("ready", (name, reconnected) => { logger.info(`Lavalink Node ${name} - connected: ${reconnected}`) })
     }
 }

@@ -15,13 +15,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@lavaclient/queue": "^2.1.1",
-    "@lavaclient/spotify": "^3.1.0",
     "@prisma/client": "^4.6.1",
     "debug": "^4.3.4",
     "discord.js": "^14.6.0",
     "ioredis": "^5.2.4",
-    "lavaclient": "^4.1.1"
+    "shoukaku": "^3.2.2"
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",
