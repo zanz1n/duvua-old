@@ -7,6 +7,6 @@ COPY ./package.json /server/
 COPY ./yarn.lock /server/
 COPY ./prisma/ /server/prisma
 
-RUN yarn install
+RUN yarn install --prod
 
 CMD yarn db-migrate && node dist/index.js
