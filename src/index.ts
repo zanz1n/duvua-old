@@ -1,12 +1,12 @@
 import { Duvua } from "./Client"
 import { config } from "./config"
-import { logger } from "./modules/logger"
 
-const TOKEN = config.token
+const { token } = config
 
-if (!TOKEN || TOKEN.length < 10) {
-    logger.error("NO VALID TOKEN PROVIDED\nGOT VALUE \"" + TOKEN + "\"")
-    process.exit(1)
+if (!token || token.length < 10) {
+    throw new Error("NO VALID TOKEN PROVIDED\nGOT VALUE \"" + token + "\"")
 }
 
-new Duvua(TOKEN)
+const bot = new Duvua()
+
+bot.login(token)

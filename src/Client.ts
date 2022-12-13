@@ -2,7 +2,6 @@ import {
     Client,
     Collection,
     Events,
-    GatewayDispatchEvents,
     GatewayIntentBits,
     Options
 } from "discord.js"
@@ -19,6 +18,8 @@ import { Kitsu } from "./modules/kitsu.io/index"
 import { Translator } from "./modules/translator/index"
 import { Shoukaku, Connectors } from "shoukaku"
 import { logger } from "./modules/logger"
+import { RedisDba } from "./redis/dba/index"
+import { ClientUtils } from "./modules/ClientUtils"
 
 export class Duvua extends Client {
     commands: Collection<string, CommandBase> = commandsData
@@ -31,15 +32,17 @@ export class Duvua extends Client {
 
     redis: RedisClient
 
+    redisDba: RedisDba
+
+    utils: ClientUtils
+
     translator: Translator
 
     kitsu: Kitsu
     
     staticHelpEmbed?: sEmbed
 
-    private _token: string
-
-    constructor(token: string) {
+    constructor() {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
@@ -59,6 +62,8 @@ export class Duvua extends Client {
         this.events = eventsData
         this.dba = new Dba()
         this.redis = new RedisClient()
+        this.redisDba = new RedisDba(this.redis)
+        this.utils = new ClientUtils()
 
         this.music = new Shoukaku(new Connectors.DiscordJS(this), [
             {
@@ -67,13 +72,7 @@ export class Duvua extends Client {
                 auth: config.lavalink.password
             }
         ])
-        this._token = token
         this.kitsu = new Kitsu(this.redis, this.translator)
-        this.init()
-    }
-
-    async init() {
-        this.login(this._token)
         this.listenForEvents()
     }
 
