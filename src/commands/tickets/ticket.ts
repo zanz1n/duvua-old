@@ -1,12 +1,10 @@
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType, GuildMember } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ComponentType, GuildBasedChannel, GuildMember } from "discord.js"
 import { createMentionByUser } from "../../modules/createMentionByUser"
-import { logger } from "../../modules/logger"
 import { sleep } from "../../modules/sleep"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
-import { ticketDbData } from "../../types/redis/ticketDbData"
 
 export const command: CommandBase = {
     category: CommandBaseCategory.TICKET,
@@ -36,48 +34,35 @@ export const command: CommandBase = {
         if (!interaction.member || !(interaction.member instanceof GuildMember)) return
         if (!interaction.guild) return
 
-        const redisIdentifier = `ticket-${interaction.guild.id}${interaction.user.id}`
+        const redisIdentifier = `${interaction.guild.id}${interaction.user.id}`
 
         const subCommand = interaction.options.getSubcommand()
 
         if (subCommand == "delete") {
-            const embed = new sEmbed()
-            const findDb = await client.redis.get(redisIdentifier)
+            const findDb = await client.redisDba.ticket.getById(redisIdentifier)
 
             if (findDb) {
-                const data = JSON.parse(findDb) as ticketDbData
-
-                const channel = await interaction.guild.channels.cache.get(data.channelId)
+                const channel = interaction.guild.channels.cache.get(findDb.channelId)
+                ?? await interaction.guild.channels.fetch(findDb.channelId)
 
                 if (channel) {
-                    await channel.delete("Removing ticket channels")
-                    await client.redis.del(redisIdentifier)
+                    channel.delete("Removing ticket channels")
                 }
-                embed.setDescription(`**Seu ticket foi deletado com sucesso, ${createMentionByUser(interaction.user)}**`)
-                await interaction.editReply({
-                    content: null,
-                    embeds: [embed]
-                })
+                Promise.all([
+                    client.redisDba.ticket.deleteById(redisIdentifier),
+                    client.utils.createDefaultReply(interaction, "Seu ticket foi deletado com sucesso, {USER}")
+                ])
                 return
             }
-            embed.setDescription(`**Você não tem nenhum ticket criado, ${createMentionByUser(interaction.user)}**`)
-            await interaction.editReply({
-                content: null,
-                embeds: [embed]
-            })
+            client.utils.createDefaultReply(interaction, "Você não tem nenhum ticket criado, {USER}")
             return
         }
 
-        if (subCommand == "create") {
-            const findTicketDb = await client.redis.get(redisIdentifier)
+        else if (subCommand == "create") {
+            const findTicketDb = await client.redisDba.ticket.getById(redisIdentifier)
 
             if (findTicketDb) {
-                const embed = new sEmbed()
-                    .setDescription(`**Você já tem um ticket criado ${createMentionByUser(interaction.user)}**`)
-                interaction.editReply({
-                    content: null,
-                    embeds: [embed]
-                })
+                client.utils.createDefaultReply(interaction, "Você já tem um ticket criado, {USER}")
                 return
             }
 
@@ -136,11 +121,11 @@ export const command: CommandBase = {
                         ]
                     })
 
-                    const ticketInfo: ticketDbData = {
+                    const dbCreation = client.redisDba.ticket.create({
+                        id: redisIdentifier,
                         enabled: true,
                         channelId: channel.id
-                    }
-                    await client.redis.set(redisIdentifier, JSON.stringify(ticketInfo))
+                    })
 
                     const ticketChannelEmbed = new sEmbed()
                         .setDescription("**Seu ticket foi criado aqui, clique no botão a baixo caso deseje deletá-lo**")
@@ -161,26 +146,39 @@ export const command: CommandBase = {
                         time: 1000 * 120
                     })
 
+                    const ticketChannelMessage = channel.send({
+                        content: createMentionByUser(interaction.user),
+                        embeds: [ticketChannelEmbed],
+                        components: [ticketChannelRow]
+                    })
+
                     ticketChannelCollector.on("collect", async (tci) => {
-                        logger.debug("AAAA")
                         if (tci.customId == `cancel-ticket${dateNow}`) {
-                            const findDb = await client.redis.get(redisIdentifier)
+                            const data = await dbCreation
 
-                            if (findDb) {
-                                const data = JSON.parse(findDb) as ticketDbData
+                            const channel = tci.guild!.channels.cache.get(data.channelId)
+                            ?? await tci.guild!.channels.fetch(data.channelId)
 
-                                const channel = await tci.guild!.channels.cache.get(data.channelId)
-
-                                if (channel) {
-                                    tci.deferUpdate()
-                                    await sleep(1000)
-                                    await channel.delete("Removing ticket channels")
-                                    await client.redis.del(redisIdentifier)
-                                }
-                                return
+                            if (channel) {
+                                tci.deferUpdate()
+                                sleep(1000).then(() => {
+                                    Promise.all([
+                                        channel.delete("Removing ticket channels"),
+                                        client.redisDba.ticket.deleteById(redisIdentifier)
+                                    ])
+                                })
                             }
                             return
                         }
+                    })
+
+                    ticketChannelCollector.on("end", async () => {
+                        ticketChannelCancelButton.setDisabled(true)
+                        ticketChannelMessage.then(msg => msg.edit({
+                            components: [ticketChannelRow]
+                        })).catch(() => {
+                            // Channel was already deleted
+                        })
                     })
 
                     const embed = new sEmbed()
@@ -200,11 +198,6 @@ export const command: CommandBase = {
                         ephemeral: true
                     })
 
-                    channel.send({
-                        content: createMentionByUser(interaction.user),
-                        embeds: [ticketChannelEmbed],
-                        components: [ticketChannelRow]
-                    })
                 }
                 if (i.customId == `ticket-no${dateNow}`) {
                     const embed = new sEmbed()
