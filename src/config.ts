@@ -1,6 +1,7 @@
 export const config = new (class {
     embedColor = 0xff21f4
     token = process.env.DISCORD_TOKEN ?? ""
+    debugMode = process.env.BOT_DEBUG_MODE == "true" ?? false
     postCommands = process.argv.find(arg =>
         arg.toLowerCase().startsWith("--post-slash-commands="))
         ?.replace("--post-slash-commands=", "") == "true" ?? false
