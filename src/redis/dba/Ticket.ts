@@ -18,22 +18,22 @@ export class TicketDb {
     }
 
     async create(options: TicketData): Promise<TicketData> {
-        return this.redis.set(options.id,
+        return this.redis.set(`ticket-${options.id}`,
             JSON.stringify({ ...options })).then(() => {
             return options
         })
     }
 
     async updateById(id: string, data: TicketUpdateData): Promise<TicketData | null> {
-        const find = await this.redis.get(id)
+        const find = await this.redis.get(`ticket-${id}`)
         if (find) {
             const findData = JSON.parse(find) as TicketData
             const newData: TicketData = {
                 channelId: data.channelId ?? findData.channelId,
                 enabled: data.enabled ?? findData.enabled,
-                id
+                id: `ticket-${id}`
             }
-            return this.redis.set(id, JSON.stringify(newData)).then(() => {
+            return this.redis.set(`ticket-${id}`, JSON.stringify(newData)).then(() => {
                 return newData
             })
         }
@@ -41,17 +41,17 @@ export class TicketDb {
     }
 
     async deleteById(id: string): Promise<TicketData | null> {
-        const find = await this.redis.get(id)
+        const find = await this.redis.get(`ticket-${id}`)
         if (find) {
             const data = JSON.parse(find) as TicketData
-            await this.redis.del(id)
+            await this.redis.del(`ticket-${id}`)
             return data
         }
         return null
     }
 
-    async findById(id: string): Promise<TicketData | null> {
-        const find = await this.redis.get(id)
+    async getById(id: string): Promise<TicketData | null> {
+        const find = await this.redis.get(`ticket-${id}`)
         if (find) {
             const data = JSON.parse(find) as TicketData
             return data
