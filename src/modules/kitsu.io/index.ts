@@ -120,7 +120,7 @@ export class Kitsu {
                 to: "pt"
             })
         const anime = new Anime(data, genresData)
-        this.redis.set(nameQuery, JSON.stringify(anime))
+        this.redis.set(nameQuery, JSON.stringify(anime), "EX", 420)
         return anime
     }
 }
