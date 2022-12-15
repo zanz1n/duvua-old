@@ -1,124 +1,16 @@
 import querryString from "querystring"
-import { logger } from "../logger"
-
-// interface generateTokenNamespaceType { generate(text: string): { name: string, value: string } }
 import { generate } from "./generateToken.js"
-
-export type isoLanguage = 
-    "auto"    |
-    "af"      |
-    "sq"      |
-    "am"      |
-    "ar"      |
-    "hy"      |
-    "az"      |
-    "eu"      |
-    "be"      |
-    "bn"      |
-    "bs"      |
-    "bg"      |
-    "ca"      |
-    "ceb"     |
-    "ny"      |
-    "zh-cn"   |
-    "zh-tw"   |
-    "co"      |
-    "hr"      |
-    "cs"      |
-    "da"      |
-    "nl"      |
-    "en"      |
-    "eo"      |
-    "et"      |
-    "tl"      |
-    "fi"      |
-    "fr"      |
-    "fy"      |
-    "gl"      |
-    "ka"      |
-    "de"      |
-    "el"      |
-    "gu"      |
-    "ht"      |
-    "ha"      |
-    "haw"     |
-    "iw"      |
-    "hi"      |
-    "hmn"     |
-    "hu"      |
-    "is"      |
-    "ig"      |
-    "id"      |
-    "ga"      |
-    "it"      |
-    "ja"      |
-    "jw"      |
-    "kn"      |
-    "kk"      |
-    "km"      |
-    "ko"      |
-    "ku"      |
-    "ky"      |
-    "lo"      |
-    "la"      |
-    "lv"      |
-    "lt"      |
-    "lb"      |
-    "mk"      |
-    "mg"      |
-    "ms"      |
-    "ml"      |
-    "mt"      |
-    "mi"      |
-    "mr"      |    
-    "mn"      |
-    "my"      |
-    "ne"      |
-    "no"      |
-    "ps"      |
-    "fa"      |
-    "pl"      |
-    "pt"      |
-    "pa"      |
-    "ro"      |
-    "ru"      |
-    "sm"      |
-    "gd"      |
-    "sr"      |
-    "st"      |
-    "sn"      |
-    "sd"      |
-    "si"      |
-    "sk"      |
-    "sl"      |
-    "so"      |
-    "es"      |
-    "su"      |
-    "sw"      |
-    "sv"      |
-    "tg"      |
-    "ta"      |
-    "te"      |
-    "th"      |
-    "tr"      |
-    "uk"      |
-    "ur"      |
-    "uz"      |
-    "vi"      |
-    "cy"      |
-    "xh"      |
-    "yi"      |
-    "yo"      |
-    "zu"
+import { isoLanguageString } from "./isoLanguageString.js"
 
 export type TranslatorOptions = {
-    from: isoLanguage
-    to: isoLanguage
+    from: isoLanguageString
+    to: isoLanguageString
 }
 
 export class Translator {
     async translate(text: string, options: TranslatorOptions): Promise<string> {
         const baseUrl = "https://translate.google.com/translate_a/single"
+
         const token = await generate(text)
         const data = {
             client: "gtx",
