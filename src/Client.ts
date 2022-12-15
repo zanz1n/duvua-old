@@ -3,30 +3,34 @@ import {
     Collection,
     Events,
     GatewayIntentBits,
-    Options
+    Options,
 } from "discord.js"
 import { EventBase } from "./types/eventBase"
 import { commands as commandsData } from "./modules/loadCommandsData"
 import { Dba } from "./db"
 import { sEmbed } from "./types/discord/sEmbed"
-
 import { RedisClient } from "./redis"
 import { config } from "./config"
 import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
 import { Kitsu } from "./modules/kitsu.io/index"
 import { Translator } from "./modules/translator/index"
-import { Shoukaku, Connectors } from "shoukaku"
-import { logger } from "./modules/logger"
+import { Shoukaku, Connectors, Track } from "shoukaku"
 import { RedisDba } from "./redis/dba/index"
 import { ClientUtils } from "./modules/ClientUtils"
+import { QueueManager } from "./modules/Queue"
+import { PrismaClient } from "@prisma/client"
 
 export class Duvua extends Client {
     commands: Collection<string, CommandBase> = commandsData
 
     events: EventBase[]
 
+    prisma: PrismaClient
+
     music: Shoukaku
+
+    musicQueues: QueueManager<Track>
 
     dba: Dba
 
@@ -59,11 +63,13 @@ export class Duvua extends Client {
         })
 
         this.translator = new Translator()
+        this.prisma = new PrismaClient()
         this.events = eventsData
-        this.dba = new Dba()
+        this.dba = new Dba(this.prisma)
         this.redis = new RedisClient()
         this.redisDba = new RedisDba(this.redis)
         this.utils = new ClientUtils()
+        this.musicQueues = new QueueManager<Track>()
 
         this.music = new Shoukaku(new Connectors.DiscordJS(this), [
             {
@@ -72,7 +78,9 @@ export class Duvua extends Client {
                 auth: config.lavalink.password
             }
         ])
+
         this.kitsu = new Kitsu(this.redis, this.translator)
+
         this.listenForEvents()
     }
 
@@ -81,7 +89,5 @@ export class Duvua extends Client {
             if (event.name == Events.InteractionCreate) this.on(event.name, async (interaction) => event.run(interaction, this))
             else if (event.name == Events.ClientReady) this.on(event.name, async () => event.run(this))
         }
-        this.music.on("error", (name, error) => logger.error(`Lavalink ${error.name} error on ${name} - ${error.message}`))
-        this.music.on("ready", (name, reconnected) => { logger.info(`Lavalink Node ${name} - connected: ${reconnected}`) })
     }
 }
