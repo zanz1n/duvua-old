@@ -19,6 +19,8 @@ services:
   #   environment:
   #     DEBUG: "bot*"
   #     NODE_NO_WARNINGS: 1
+  #   ports:
+  #     - 5555:5555
 
   nodejs:
     container_name: nodejs
@@ -71,6 +73,18 @@ services:
       - botjs
     env_file:
       - .env
+
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   networks:
+  #     - botjs
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     GUNICORN_ACCESS_LOGFILE: /dev/null
+  #   ports:
+  #     - 2280:80
 
 networks:
   botjs:
