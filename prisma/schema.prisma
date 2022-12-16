@@ -7,79 +7,169 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Member {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
-  MCID          String    @db.VarChar(48) @unique
-  silverCoins   BigInt    @default(0)
-  XP            BigInt    @default(0)
-  level         BigInt    @default(0)
-  dj            Boolean   @default(false)
-  playAllowed   Boolean   @default(false)
+  MCID        String   @unique @db.VarChar(48)
+  silverCoins Int      @default(0)
+  XP          Int      @default(0)
+  level       Int      @default(0)
+  dj          Boolean  @default(false)
+  playAllowed Boolean  @default(false)
 
-  guild         Guild     @relation(fields: [guildId], references: [dcId])
-  guildId       String    @db.VarChar(24)
+  guild       Guild    @relation(fields: [guildId], references: [dcId])
+  guildId     String   @db.VarChar(24)
 
-  ticket        Ticket?
+  ticket      Ticket?
 
-  user          User      @relation(fields: [userId], references: [dcId])
-  userId        String    @db.VarChar(24)
+  user        User     @relation(fields: [userId], references: [dcId])
+  userId      String   @db.VarChar(24)
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now() )
-  updatedAt     DateTime  @updatedAt
+  id           Int       @id @default(autoincrement())
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
-  dcId          String    @db.VarChar(24) @unique
-  lastDailyReq  BigInt 
-  job           MemberJob @default(MENDIGO)
-  goldCoins     BigInt    @default(0)
+  dcId         String    @unique @db.VarChar(24)
+  lastDailyReq Int
+  job          MemberJob @default(MENDIGO)
+  goldCoins    Int       @default(0)
 
-  members       Member[]
+  members      Member[]
 }
 
 model Guild {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  dcId          String    @unique @db.VarChar(24)
-  prefix        String    @db.VarChar(4) @default("-")
-  enableTickets Boolean   @default(true)
-  musicStrictM  Boolean   @default(false)
+  dcId          String   @unique @db.VarChar(24)
+  prefix        String   @default("-") @db.VarChar(4)
+  enableTickets Boolean  @default(true)
+  musicStrictM  Boolean  @default(false)
 
   welcome       Welcome?
   members       Member[]
 }
 
 model Welcome {
-  id            Int       @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
 
-  enabled       Boolean   @default(false)
-  channelId     String?   @db.VarChar(24)
-  message       String    @db.VarChar(255) @default("Seja Bem Vind@ ao servidor")
-  type          WCType    @default(MESSAGE)
+  enabled   Boolean @default(false)
+  channelId String? @db.VarChar(24)
+  message   String  @default("Seja Bem Vind@ ao servidor USER") @db.VarChar(255)
+  type      WCType  @default(MESSAGE)
 
-  guild         Guild     @relation(fields: [guildId], references: [dcId])
-  guildId       String    @unique
+  guild     Guild   @relation(fields: [guildId], references: [dcId])
+  guildId   String  @unique
 }
 
 model Ticket {
-  id            Int       @id @default(autoincrement())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  channelId     String    @unique
+  channelId String   @unique
 
-  enabled       Boolean
-  member        Member    @relation(fields: [memberId], references: [MCID])
-  memberId      String    @unique
+  enabled   Boolean
+  member    Member   @relation(fields: [memberId], references: [MCID])
+  memberId  String   @unique
+}
+
+model Anime {
+  id                   Int                      @id @default(autoincrement())
+  kitsuId              String                   @unique
+  slug                 String
+
+  createdAt            String
+  updatedAt            String
+  startDate            String?
+  endDate              String?
+
+  synopsis             String
+  synopsisEn           String
+  coverImageTopOffset  Int?
+
+  titles_en            String?
+  titles_enJp          String?
+  titles_jaJp          String?
+
+  canonicalTitle       String?
+  abbreviatedTitles    String[]
+  averageRating        String?
+  ratingFrequencies    String? // Object
+  userCount            Int?
+  favoritesCount       Int?
+  popularityRank       Int?
+  ratingRank           Int?
+
+  ageRating            AnimeAttributesAgeRating?
+  ageRatingGuide       String?
+  subtype              AnimeAttributesSubType?
+  status               AnimeAttributesStatus?
+  tba                  String?
+
+  posterImage_tiny     String?
+  posterImage_small    String?
+  posterImage_medium   String?
+  posterImage_large    String?
+  posterImage_original String?
+  posterImage_meta     String? // Object
+
+  coverImage_tiny      String?
+  coverImage_small     String?
+  coverImage_large     String?
+  coverImage_original  String?
+  coverImage_meta      String? // Object
+
+  episodeCount         Int?
+  episodeLength        Int?
+  youtubeVideoId       String?
+  showType             AnimeAttributesSubType?
+  nsfw                 Boolean?
+  genres               String[]
+
+  relationalRefs       AnimeReference[]
+}
+
+model AnimeReference {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  value     String   @unique
+  anime     Anime    @relation(fields: [animeId], references: [id])
+  animeId   Int
+}
+
+enum AnimeAttributesAgeRating {
+  G
+  PG
+  R
+  R18
+}
+
+enum AnimeAttributesSubType {
+  ONA
+  OVA
+  TV
+  MOVIE
+  MUSIC
+  SPECIAL
+}
+
+enum AnimeAttributesStatus {
+  CURRENT
+  FINISHED
+  TBA
+  UNRELEASED
+  UPCOMING
 }
 
 enum MemberJob {
