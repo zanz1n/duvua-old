@@ -9,7 +9,6 @@ export const event: EventBase = {
     name: Events.GuildMemberAdd,
     enabled: true,
     async run(member: GuildMember, client: Duvua) {
-        console.time("memeberAdd")
         const cache = await client.redis.getex(`welcome-${member.guild.id}`, "EX", 120)
 
         let welcomeDb: Welcome
@@ -49,7 +48,6 @@ export const event: EventBase = {
         else if (welcomeDb.type == "MESSAGE") {
             channelToSend.send({ content: message })
         }
-        console.timeEnd("memeberAdd")
         return
     }
 }

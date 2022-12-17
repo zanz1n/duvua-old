@@ -1,6 +1,5 @@
 import { ApplicationCommandOptionType, ChannelType, GuildMember, PermissionFlagsBits } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
-import { logger } from "../../modules/logger"
 import { Duvua } from "../../Client"
 import { Welcome } from "@prisma/client"
 
@@ -110,7 +109,6 @@ export const command: CommandBase = {
                 }).then((result) => {
                     refreshCache(client, result)
                     replyMessage = `Mensagem de boas vindas do tipo ${contentType} atualizada. Usando o canal <#${result.channelId}>`
-                    logger.debug(`find - ${JSON.stringify(result)}`)
                 })
             } else {
                 await client.prisma.welcome.create({
@@ -132,7 +130,6 @@ export const command: CommandBase = {
                 }).then((result) => {
                     refreshCache(client, result)
                     replyMessage = `Mensagem de boas vindas do tipo ${contentType} criada. Usando o canal <#${result.channelId}>`
-                    logger.debug(`dont find - ${JSON.stringify(result)}`)
                 })
             }
 
