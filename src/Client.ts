@@ -79,7 +79,7 @@ export class Duvua extends Client {
             }
         ])
 
-        this.kitsu = new Kitsu(this.redis, this.translator)
+        this.kitsu = new Kitsu(this.prisma, this.translator, this.redis)
 
         this.listenForEvents()
     }
@@ -88,6 +88,7 @@ export class Duvua extends Client {
         for (const event of this.events) {
             if (event.name == Events.InteractionCreate) this.on(event.name, async (interaction) => event.run(interaction, this))
             else if (event.name == Events.ClientReady) this.on(event.name, async () => event.run(this))
+            else if (event.name == Events.GuildMemberAdd) this.on(event.name, async (member) => event.run(member, this))
         }
     }
 }
