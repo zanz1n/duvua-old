@@ -34,6 +34,7 @@ export class Translator {
             method: "POST"
         }).then(res => res.json())
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         body[0].forEach((obj: any) => {
             if (obj[0]) {
                 textResult += obj[0]
