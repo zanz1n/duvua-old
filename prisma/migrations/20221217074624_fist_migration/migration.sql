@@ -18,14 +18,14 @@ CREATE TABLE "Member" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "MCID" VARCHAR(48) NOT NULL,
+    "MCID" VARCHAR(40) NOT NULL,
     "silverCoins" INTEGER NOT NULL DEFAULT 0,
     "XP" INTEGER NOT NULL DEFAULT 0,
     "level" INTEGER NOT NULL DEFAULT 0,
     "dj" BOOLEAN NOT NULL DEFAULT false,
     "playAllowed" BOOLEAN NOT NULL DEFAULT false,
-    "guildId" VARCHAR(24) NOT NULL,
-    "userId" VARCHAR(24) NOT NULL,
+    "guildId" VARCHAR(20) NOT NULL,
+    "userId" VARCHAR(20) NOT NULL,
 
     CONSTRAINT "Member_pkey" PRIMARY KEY ("id")
 );
@@ -35,7 +35,7 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "dcId" VARCHAR(24) NOT NULL,
+    "dcId" VARCHAR(20) NOT NULL,
     "lastDailyReq" INTEGER NOT NULL,
     "job" "MemberJob" NOT NULL DEFAULT 'MENDIGO',
     "goldCoins" INTEGER NOT NULL DEFAULT 0,
@@ -48,7 +48,7 @@ CREATE TABLE "Guild" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "dcId" VARCHAR(24) NOT NULL,
+    "dcId" VARCHAR(20) NOT NULL,
     "prefix" VARCHAR(4) NOT NULL DEFAULT '-',
     "enableTickets" BOOLEAN NOT NULL DEFAULT true,
     "musicStrictM" BOOLEAN NOT NULL DEFAULT false,
@@ -60,24 +60,12 @@ CREATE TABLE "Guild" (
 CREATE TABLE "Welcome" (
     "id" SERIAL NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT false,
-    "channelId" VARCHAR(24),
+    "channelId" VARCHAR(20),
     "message" VARCHAR(255) NOT NULL DEFAULT 'Seja Bem Vind@ ao servidor USER',
     "type" "WCType" NOT NULL DEFAULT 'MESSAGE',
-    "guildId" TEXT NOT NULL,
+    "guildDcId" VARCHAR(20) NOT NULL,
 
     CONSTRAINT "Welcome_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Ticket" (
-    "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "channelId" TEXT NOT NULL,
-    "enabled" BOOLEAN NOT NULL,
-    "memberId" TEXT NOT NULL,
-
-    CONSTRAINT "Ticket_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -144,25 +132,37 @@ CREATE TABLE "AnimeReference" (
 CREATE UNIQUE INDEX "Member_MCID_key" ON "Member"("MCID");
 
 -- CreateIndex
+CREATE INDEX "Member_id_MCID_idx" ON "Member"("id", "MCID");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_dcId_key" ON "User"("dcId");
+
+-- CreateIndex
+CREATE INDEX "User_id_dcId_idx" ON "User"("id", "dcId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Guild_dcId_key" ON "Guild"("dcId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Welcome_guildId_key" ON "Welcome"("guildId");
+CREATE INDEX "Guild_dcId_id_idx" ON "Guild"("dcId", "id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Ticket_channelId_key" ON "Ticket"("channelId");
+CREATE UNIQUE INDEX "Welcome_guildDcId_key" ON "Welcome"("guildDcId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Ticket_memberId_key" ON "Ticket"("memberId");
+CREATE INDEX "Welcome_guildDcId_id_idx" ON "Welcome"("guildDcId", "id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Anime_kitsuId_key" ON "Anime"("kitsuId");
 
 -- CreateIndex
+CREATE INDEX "Anime_id_kitsuId_idx" ON "Anime"("id", "kitsuId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "AnimeReference_value_key" ON "AnimeReference"("value");
+
+-- CreateIndex
+CREATE INDEX "AnimeReference_id_value_idx" ON "AnimeReference"("id", "value");
 
 -- AddForeignKey
 ALTER TABLE "Member" ADD CONSTRAINT "Member_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -171,10 +171,7 @@ ALTER TABLE "Member" ADD CONSTRAINT "Member_guildId_fkey" FOREIGN KEY ("guildId"
 ALTER TABLE "Member" ADD CONSTRAINT "Member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Welcome" ADD CONSTRAINT "Welcome_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_memberId_fkey" FOREIGN KEY ("memberId") REFERENCES "Member"("MCID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Welcome" ADD CONSTRAINT "Welcome_guildDcId_fkey" FOREIGN KEY ("guildDcId") REFERENCES "Guild"("dcId") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "AnimeReference" ADD CONSTRAINT "AnimeReference_animeId_fkey" FOREIGN KEY ("animeId") REFERENCES "Anime"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

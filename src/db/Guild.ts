@@ -5,20 +5,18 @@ export class GuildDb {
     private prisma: PrismaClient
     constructor(client: PrismaClient) { this.prisma = client }
 
-    public async getFromGuild(guild: GuildData) {
+    public async getFromGuild(guild: GuildData, welcome: boolean) {
         return await this.prisma.guild.findFirst({
-            where: { dcId: guild.id }
-        }).then((data) => {
-            return data
-        }).catch(() => {
-            return null
+            where: { dcId: guild.id },
+            include: { welcome }
         })
     }
 
-    public async updateFromGuild(guild: GuildData, data: Prisma.GuildUpdateInput) {
+    public async updateFromGuild(guild: GuildData, data: Prisma.GuildUpdateInput, welcome: boolean) {
         return await this.prisma.guild.update({
             where: { dcId: guild.id },
-            data
+            data,
+            include: { welcome }
         }).then((result) => {
             return result
         }).catch(() => {
@@ -26,41 +24,32 @@ export class GuildDb {
         })
     }
 
-    public async createFromGuild(guild: GuildData, data?: Prisma.GuildUpdateInput) {
+    public async createFromGuild(guild: GuildData, welcome: boolean, data?: Prisma.GuildUpdateInput) {
         if (data) {
             return await this.prisma.guild.create({
                 data: {
-                    dcId: guild.id,
-                }
-            }).then(async (data) => {
-                await this.updateFromGuild(guild, data)
-                return data
+                    dcId: guild.id
+                },
+                include: { welcome }
+            }).then(async (result) => {
+                await this.updateFromGuild(guild, data, welcome)
+                return result
             })
         }
         return await this.prisma.guild.create({
             data: {
-                dcId: guild.id,
-                welcome: {
-                    connectOrCreate: {
-                        create: {
-                            channelId: null,
-                            enabled: false
-                        },
-                        where: {
-                            guildId: guild.id
-                        }
-                    }
-                }
-            }
+                dcId: guild.id
+            },
+            include: { welcome }
         }).then((result) => {
             return result
         })
     }
 
-    public async getOrCreateFromGuild(guild: GuildData) {
-        const find = await this.getFromGuild(guild)
+    public async getOrCreateFromGuild(guild: GuildData, welcome: boolean) {
+        const find = await this.getFromGuild(guild, welcome)
         if (find) return find
 
-        return this.createFromGuild(guild)
+        return this.createFromGuild(guild, welcome)
     }
 }

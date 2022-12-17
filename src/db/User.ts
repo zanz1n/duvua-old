@@ -11,10 +11,6 @@ export class UserDb {
             where: {
                 dcId: user.id
             }
-        }).then((result) => {
-            return result
-        }).catch(() => {
-            return null
         })
     }
 

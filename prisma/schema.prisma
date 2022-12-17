@@ -14,8 +14,8 @@ model Member {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  MCID        String   @unique @db.VarChar(48)
+  MCID        String   @unique @db.VarChar(40)
+
   silverCoins Int      @default(0)
   XP          Int      @default(0)
   level       Int      @default(0)
@@ -23,12 +23,12 @@ model Member {
   playAllowed Boolean  @default(false)
 
   guild       Guild    @relation(fields: [guildId], references: [dcId])
-  guildId     String   @db.VarChar(24)
-
-  ticket      Ticket?
+  guildId     String   @db.VarChar(20)
 
   user        User     @relation(fields: [userId], references: [dcId])
-  userId      String   @db.VarChar(24)
+  userId      String   @db.VarChar(20)
+
+  @@index([id, MCID])
 }
 
 model User {
@@ -36,12 +36,14 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
-  dcId         String    @unique @db.VarChar(24)
+  dcId         String    @unique @db.VarChar(20)
   lastDailyReq Int
   job          MemberJob @default(MENDIGO)
   goldCoins    Int       @default(0)
 
   members      Member[]
+
+  @@index([id, dcId])
 }
 
 model Guild {
@@ -49,37 +51,29 @@ model Guild {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  dcId          String   @unique @db.VarChar(24)
+  dcId          String   @unique @db.VarChar(20)
   prefix        String   @default("-") @db.VarChar(4)
   enableTickets Boolean  @default(true)
   musicStrictM  Boolean  @default(false)
 
   welcome       Welcome?
   members       Member[]
+
+  @@index([dcId, id])
 }
 
 model Welcome {
   id        Int     @id @default(autoincrement())
 
   enabled   Boolean @default(false)
-  channelId String? @db.VarChar(24)
+  channelId String? @db.VarChar(20)
   message   String  @default("Seja Bem Vind@ ao servidor USER") @db.VarChar(255)
   type      WCType  @default(MESSAGE)
 
-  guild     Guild   @relation(fields: [guildId], references: [dcId])
-  guildId   String  @unique
-}
+  guild     Guild   @relation(fields: [guildDcId], references: [dcId])
+  guildDcId String  @db.VarChar(20) @unique
 
-model Ticket {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  channelId String   @unique
-
-  enabled   Boolean
-  member    Member   @relation(fields: [memberId], references: [MCID])
-  memberId  String   @unique
+  @@index([guildDcId, id])
 }
 
 model Anime {
@@ -136,6 +130,8 @@ model Anime {
   genres               String[]
 
   relationalRefs       AnimeReference[]
+
+  @@index([id, kitsuId])
 }
 
 model AnimeReference {
@@ -146,6 +142,8 @@ model AnimeReference {
   value     String   @unique
   anime     Anime    @relation(fields: [animeId], references: [id])
   animeId   Int
+
+  @@index([id, value])
 }
 
 enum AnimeAttributesAgeRating {
