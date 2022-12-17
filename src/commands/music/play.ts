@@ -37,7 +37,7 @@ export const command: CommandBase = {
             return
         }
 
-        const guildDb = await client.dba.guild.getOrCreateFromGuild(interaction.guild)
+        const guildDb = await client.dba.guild.getOrCreateFromGuild(interaction.guild, false)
 
         if (guildDb.musicStrictM) {
             const memberDb = await client.dba.member.getOrCreateFromMember(interaction.member)
