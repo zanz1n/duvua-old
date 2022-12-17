@@ -12,11 +12,11 @@ export interface AnimeSearchResponseDataAttributesCoverImageMeta {
 }
 
 export interface AnimeSearchResponseDataAttributesCoverImage {
-    tiny: string
-    small: string
-    large: string
-    original: string
-    meta: AnimeSearchResponseDataAttributesCoverImageMeta
+    tiny: string | null
+    small: string | null
+    large: string | null
+    original: string | null
+    meta: AnimeSearchResponseDataAttributesCoverImageMeta | null
 }
 
 export interface AnimeSearchResponseDataAttributesPosterImageMetaDimension {
@@ -34,12 +34,12 @@ export interface AnimeSearchResponseDataAttributesPosterImageMeta {
 }
 
 export interface AnimeSearchResponseDataAttributesPosterImage {
-    tiny: string
-    small: string
-    medium: string
-    large: string
-    original: string
-    meta: AnimeSearchResponseDataAttributesPosterImageMeta
+    tiny: string | null
+    small: string | null
+    medium: string | null
+    large: string | null
+    original: string | null
+    meta: AnimeSearchResponseDataAttributesPosterImageMeta | null
 }
 
 export type AnimeSearchResponseDataAttributesStatus = "current" | "finished" | "tba" | "unreleased" | "upcoming"
@@ -71,9 +71,9 @@ export interface AnimeSearchResponseDataAttributesRatingFrequencies {
 }
 
 export interface AnimeSearchResponseDataAttributesTitles {
-    en: string
-    en_jp: string
-    ja_jp: string
+    en: string | null
+    en_jp: string | null
+    ja_jp: string | null
 }
 
 export interface AnimeSearchResponseDataAttributes {
@@ -81,30 +81,30 @@ export interface AnimeSearchResponseDataAttributes {
     updatedAt: string
     slug: string
     synopsis: string
-    coverImageTopOffset: number
+    coverImageTopOffset: number | null
     titles: AnimeSearchResponseDataAttributesTitles
-    canonicalTitle: string
-    abbreviatedTitles: string[]
-    averageRating: string
-    ratingFrequencies: AnimeSearchResponseDataAttributesRatingFrequencies
-    userCount: number
-    favoritesCount: number
-    startDate: string
-    endDate: string
-    popularityRank: number
-    ratingRank: number
-    ageRating: AnimeSearchResponseDataAttributesAgeRating
-    ageRatingGuide: string
-    subtype: AnimeSearchResponseDataAttributesSubType
-    status: AnimeSearchResponseDataAttributesStatus
-    tba: string
+    canonicalTitle: string | null
+    abbreviatedTitles: string[] | null
+    averageRating: string | null
+    ratingFrequencies: AnimeSearchResponseDataAttributesRatingFrequencies | null
+    userCount: number | null
+    favoritesCount: number | null
+    startDate: string | null
+    endDate: string | null
+    popularityRank: number | null
+    ratingRank: number | null
+    ageRating: AnimeSearchResponseDataAttributesAgeRating | null
+    ageRatingGuide: string | null
+    subtype: AnimeSearchResponseDataAttributesSubType | null
+    status: AnimeSearchResponseDataAttributesStatus | null
+    tba: string  | null
     posterImage: AnimeSearchResponseDataAttributesPosterImage | null
     coverImage: AnimeSearchResponseDataAttributesCoverImage | null
-    episodeCount: number
-    episodeLength: number
+    episodeCount: number | null
+    episodeLength: number | null
     youtubeVideoId: string | null
-    showType: AnimeSearchResponseDataAttributesSubType
-    nsfw: boolean
+    showType: AnimeSearchResponseDataAttributesSubType | null
+    nsfw: boolean | null
 }
 
 export interface AnimeSearchResponseDataRelationship {

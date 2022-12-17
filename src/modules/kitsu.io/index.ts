@@ -1,126 +1,142 @@
-import { Redis } from "ioredis"
-import {
-    AnimeRelationshipGenresResponse, AnimeRelationshipGenresResponseData
-} from "./types/animeGenresApiData"
-import {
-    AnimeSearchResponse,
-    AnimeSearchResponseDataAttributes,
-    AnimeSearchResponseDataAttributesAgeRating,
-    AnimeSearchResponseDataAttributesCoverImage,
-    AnimeSearchResponseDataAttributesPosterImage,
-    AnimeSearchResponseDataAttributesRatingFrequencies,
-    AnimeSearchResponseDataAttributesStatus,
-    AnimeSearchResponseDataAttributesSubType,
-    AnimeSearchResponseDataAttributesTitles
-} from "./types/animeSearchApiData"
 import { Translator } from "../translator/index"
 import { logger } from "../logger"
+import { AnimeAttributesStatus, AnimeAttributesSubType, PrismaClient } from "@prisma/client"
 
-interface AnimeRedisCache {
-    data: AnimeSearchResponse,
-    genresData: AnimeRelationshipGenresResponse
-}
-
-export class Anime implements AnimeSearchResponseDataAttributes {
-    createdAt: string
-    updatedAt: string
-    slug: string
-    synopsis: string
-    coverImageTopOffset: number
-    titles: AnimeSearchResponseDataAttributesTitles
-    canonicalTitle: string
-    abbreviatedTitles: string[]
-    averageRating: string
-    ratingFrequencies: AnimeSearchResponseDataAttributesRatingFrequencies
-    userCount: number
-    favoritesCount: number
-    startDate: string
-    endDate: string
-    popularityRank: number
-    ratingRank: number
-    ageRating: AnimeSearchResponseDataAttributesAgeRating
-    ageRatingGuide: string
-    subtype: AnimeSearchResponseDataAttributesSubType
-    status: AnimeSearchResponseDataAttributesStatus
-    tba: string
-    posterImage: AnimeSearchResponseDataAttributesPosterImage | null
-    coverImage: AnimeSearchResponseDataAttributesCoverImage | null
-    episodeCount: number
-    episodeLength: number
-    youtubeVideoId: string | null
-    showType: AnimeSearchResponseDataAttributesSubType
-    nsfw: boolean
-    genres: string[] | null
-
-    constructor(data: AnimeSearchResponse, genresData: AnimeRelationshipGenresResponse) {
-        if (!genresData.data[0]) this.genres = null
-        const genres: string[] = []
-        genresData.data.forEach(attr => genres.push(attr.attributes.name))
-        this.genres = genres
-
-        this.createdAt = data.data[0].attributes.createdAt
-        this.updatedAt = data.data[0].attributes.updatedAt
-        this.slug = data.data[0].attributes.slug
-        this.synopsis = data.data[0].attributes.synopsis
-        this.coverImageTopOffset = data.data[0].attributes.coverImageTopOffset
-        this.titles = data.data[0].attributes.titles
-        this.canonicalTitle = data.data[0].attributes.canonicalTitle
-        this.abbreviatedTitles = data.data[0].attributes.abbreviatedTitles
-        this.averageRating = data.data[0].attributes.averageRating
-        this.ratingFrequencies = data.data[0].attributes.ratingFrequencies
-        this.userCount = data.data[0].attributes.userCount
-        this.favoritesCount = data.data[0].attributes.favoritesCount
-        this.startDate = data.data[0].attributes.startDate
-        this.endDate = data.data[0].attributes.endDate
-        this.popularityRank = data.data[0].attributes.popularityRank
-        this.ratingRank = data.data[0].attributes.ratingRank
-        this.ageRating = data.data[0].attributes.ageRating
-        this.ageRatingGuide = data.data[0].attributes.ageRatingGuide
-        this.subtype = data.data[0].attributes.subtype
-        this.status = data.data[0].attributes.status
-        this.tba = data.data[0].attributes.tba
-        this.posterImage = data.data[0].attributes.posterImage
-        this.coverImage = data.data[0].attributes.coverImage
-        this.episodeCount = data.data[0].attributes.episodeCount
-        this.episodeLength = data.data[0].attributes.episodeLength
-        this.youtubeVideoId = data.data[0].attributes.youtubeVideoId
-        this.showType = data.data[0].attributes.showType
-        this.nsfw = data.data[0].attributes.nsfw
-    }
-}
+import { AnimeData } from "./types/Anime"
+import { AnimeSearchResponse } from "./types/animeSearchApiData"
+import { AnimeRelationshipGenresResponse } from "./types/animeGenresApiData"
+import { Redis } from "ioredis"
 
 export class Kitsu {
-    redis: Redis
+    prisma: PrismaClient
     translator: Translator
-    constructor(redis: Redis, translator: Translator) {
-        this.redis = redis
+    redis: Redis
+    constructor(prisma: PrismaClient, translator: Translator, redis: Redis) {
+        this.prisma = prisma
         this.translator = translator
+        this.redis = redis
     }
 
-    public getAnimeFromName = async (name: string) => {
+    public getAnimeFromName = async (name: string): Promise<AnimeData | null> => {
         const nameQuery = name.split(" ").join("-").toLowerCase()
 
-        const cache = await this.redis.get(nameQuery)
-
-        if (cache) {
-            const cacheData = JSON.parse(cache) as Anime
-            return cacheData
+        const blacklist = await this.redis.get("anime-name-query-blacklist")
+        if (blacklist) {
+            const blJson = JSON.parse(blacklist) as string[]
+            if (blJson.includes(nameQuery)) return null
         }
 
-        const data = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${nameQuery}`)
-            .then(res => res.json()) as AnimeSearchResponse
-        if (!data.data[0]) return null
+        const animeDb = await this.prisma.anime.findFirst({
+            where: {
+                relationalRefs: {
+                    some: {
+                        value: nameQuery
+                    }
+                }
+            }
+        })
 
-        const genresData = await fetch(data.data[0].relationships.genres.links.related)
-            .then(res => res.json()) as AnimeRelationshipGenresResponse
-    
-        data.data[0].attributes.synopsis = 
-            await this.translator.translate(data.data[0].attributes.synopsis, {
-                from: "en",
-                to: "pt"
+        if (animeDb) {
+            logger.debug("Find relation")
+            return new AnimeData(animeDb)
+        }
+
+        logger.debug("Don't find relation")
+
+        const data = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${nameQuery}`)
+            .then(res => res.json().catch(() => null)) as AnimeSearchResponse
+        
+        if (!data.data[0]) {
+            this.redis.get("anime-name-query-blacklist")
+                .then(async (bl) => {
+                    let newBlackList: string[]
+                    if (!bl) {
+                        newBlackList = []
+                    } else {
+                        newBlackList = (JSON.parse(bl) as string[])
+                    }
+                    newBlackList.push(nameQuery)
+                    await this.redis.set("anime-name-query-blacklist", JSON.stringify(newBlackList), "EX", 600)
+                })
+            return null
+        }
+
+        const genresData = fetch(data.data[0].relationships.genres.links.related)
+            .then(res => res.json()) as Promise<AnimeRelationshipGenresResponse>
+
+        const { attributes } = data.data[0]
+
+        let animeDbFromKitsuId = await this.prisma.anime.findFirst({
+            where: {
+                kitsuId: data.data[0].id
+            }
+        })
+
+        const genres: string[] = [];
+
+        (await genresData).data.forEach(dt => genres.push(dt.attributes.name ?? ""))
+
+        if (!animeDbFromKitsuId) {
+            logger.debug("Don't find DB ... creating")
+            animeDbFromKitsuId = await this.prisma.anime.create({
+                data: {
+                    kitsuId: data.data[0].id,
+                    synopsis: "",
+                    synopsisEn: attributes.synopsis,
+                    coverImage_large: attributes.coverImage?.large,
+                    coverImage_meta: attributes.coverImage?.meta ? JSON.stringify(attributes.coverImage.meta) : null,
+                    coverImage_original: attributes.coverImage?.original,
+                    coverImage_small: attributes.coverImage?.small,
+                    coverImage_tiny: attributes.coverImage?.tiny,
+                    posterImage_large: attributes.posterImage?.large,
+                    posterImage_medium: attributes.posterImage?.medium,
+                    posterImage_original: attributes.posterImage?.original,
+                    posterImage_small: attributes.posterImage?.small,
+                    posterImage_tiny: attributes.posterImage?.tiny,
+                    posterImage_meta: attributes.posterImage?.meta ? JSON.stringify(attributes.posterImage.meta) : null,
+                    ratingFrequencies: attributes.ratingFrequencies ? JSON.stringify(attributes.ratingFrequencies) : null,
+                    showType: attributes.showType ? attributes.showType.toUpperCase() as AnimeAttributesSubType : undefined,
+                    status: attributes.status ? attributes.status.toUpperCase() as AnimeAttributesStatus : undefined,
+                    subtype: attributes.subtype ? attributes.subtype.toUpperCase() as AnimeAttributesSubType : undefined,
+                    titles_en: attributes.titles.en,
+                    titles_enJp: attributes.titles.en_jp,
+                    titles_jaJp: attributes.titles.ja_jp,
+                    abbreviatedTitles: attributes.abbreviatedTitles ?? [],
+                    genres,
+
+                    createdAt: attributes.createdAt,
+                    slug: attributes.slug,
+                    updatedAt: attributes.updatedAt,
+                    ageRating: attributes.ageRating,
+                    ageRatingGuide: attributes.ageRatingGuide,
+                    averageRating: attributes.averageRating,
+                    canonicalTitle: attributes.canonicalTitle,
+                    coverImageTopOffset: attributes.coverImageTopOffset,
+                    endDate: attributes.endDate,
+                    episodeCount: attributes.episodeCount,
+                    episodeLength: attributes.episodeLength,
+                    favoritesCount: attributes.favoritesCount,
+                    nsfw: attributes.nsfw,
+                    popularityRank: attributes.popularityRank,
+                    ratingRank: attributes.ratingRank,
+                    startDate: attributes.startDate,
+                    tba: attributes.tba,
+                    userCount: attributes.userCount,
+                    youtubeVideoId: attributes.youtubeVideoId
+                }
             })
-        const anime = new Anime(data, genresData)
-        this.redis.set(nameQuery, JSON.stringify(anime), "EX", 420)
-        return anime
+        }
+        await this.prisma.animeReference.create({
+            data: {
+                value: nameQuery,
+                anime: {
+                    connect: {
+                        id: animeDbFromKitsuId.id
+                    }
+                }
+            }
+        })
+
+        return new AnimeData(animeDbFromKitsuId)
     }
 }
