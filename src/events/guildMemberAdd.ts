@@ -26,7 +26,7 @@ export const event: EventBase = {
             client.redis.set(`welcome-${member.guild.id}`, JSON.stringify(welcomeDb), "EX", 120)
         } else welcomeDb = JSON.parse(cache) as Welcome
 
-        if (!welcomeDb || !welcomeDb?.channelId) return
+        if (!welcomeDb || !welcomeDb?.channelId || !welcomeDb.enabled) return
 
         const channelToSend = member.guild.channels.cache.get(welcomeDb.channelId) ?? await member.guild.channels.fetch(welcomeDb.channelId)
 
