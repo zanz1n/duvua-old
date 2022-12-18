@@ -80,6 +80,8 @@ export class Kitsu {
             logger.debug("Don't find DB ... creating")
             animeDbFromKitsuId = await this.prisma.anime.create({
                 data: {
+                    // THIS SYNTAX CAUSE AN UNEXPECTED BUG EVEN IF NON EQUAL PROPRERTIES OVERWRITEN
+                    // ...attributes,
                     kitsuId: data.data[0].id,
                     synopsis: "",
                     synopsisEn: attributes.synopsis,
