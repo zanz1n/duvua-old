@@ -4,10 +4,7 @@ import { Duvua } from "../../Client"
 import { Welcome } from "@prisma/client"
 
 async function refreshCache(client: Duvua, data: Welcome) {
-    const cache = await client.redis.getex(`welcome-${data.guildDcId}`, "EX", 120)
-    if (cache) {
-        await client.redis.set(`welcome-${data.guildDcId}`, JSON.stringify(data), "EX", 120)
-    }
+    client.redis.set(`welcome-${data.guildDcId}`, JSON.stringify(data), "EX", 120)
 }
 
 export const command: CommandBase = {
@@ -57,6 +54,19 @@ export const command: CommandBase = {
                         ]
                     }
                 ]
+            },
+            {
+                type: ApplicationCommandOptionType.Subcommand,
+                name: "enablewelcome",
+                description: "Habilita ou desabilita a funcionalidade de mensagem de boas vindas",
+                options: [
+                    {
+                        type: ApplicationCommandOptionType.Boolean,
+                        name: "habilitado",
+                        description: "A mensagem de boas vindas deve ser hablilitada",
+                        required: true
+                    }
+                ]
             }
         ]
     },
@@ -104,7 +114,8 @@ export const command: CommandBase = {
                     data: {
                         message,
                         channelId: channel.id,
-                        type: contentType
+                        type: contentType,
+                        enabled: true
                     }
                 }).then((result) => {
                     refreshCache(client, result)
@@ -116,6 +127,7 @@ export const command: CommandBase = {
                         message,
                         channelId: channel.id,
                         type: contentType,
+                        enabled: true,
                         guild: {
                             connectOrCreate: {
                                 create: {
@@ -130,6 +142,55 @@ export const command: CommandBase = {
                 }).then((result) => {
                     refreshCache(client, result)
                     replyMessage = `Mensagem de boas vindas do tipo ${contentType} criada. Usando o canal <#${result.channelId}>`
+                })
+            }
+
+            client.utils.createDefaultReply(interaction, replyMessage)
+            return
+        }
+        else if (subCommand == "enablewelcome") {
+            const enabled = interaction.options.getBoolean("habilitado", true)
+
+            let replyMessage = ""
+
+            const findWelcomeDb = await client.prisma.welcome.findFirst({
+                where: {
+                    guildDcId: interaction.guild.id
+                }
+            })
+
+            if (findWelcomeDb) {
+                await client.prisma.welcome.update({
+                    where: {
+                        guildDcId: interaction.guild.id
+                    },
+                    data: {
+                        enabled
+                    }
+                }).then((result) => {
+                    refreshCache(client, result)
+                    replyMessage = "A mensagem de boas vindas foi " + 
+                    enabled ? "habilitada, se a mensagem ainda não está configurado use o comando /config welcome para fazer isso" : "desabilitada"
+                })
+            } else {
+                await client.prisma.welcome.create({
+                    data: {
+                        enabled,
+                        guild: {
+                            connectOrCreate: {
+                                create: {
+                                    dcId: interaction.guild!.id,
+                                },
+                                where: {
+                                    dcId: interaction.guild!.id,
+                                }
+                            }
+                        }
+                    }
+                }).then((result) => {
+                    refreshCache(client, result)
+                    replyMessage = "A mensagem de boas vindas foi " + 
+                    enabled ? "habilitada, porém ainda será necessário configurar a mensagem usando o comando /config welcome" : "desabilitada"
                 })
             }
 
