@@ -6,7 +6,7 @@ import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
 
 export const command: CommandBase = {
-    category: CommandBaseCategory.FUN,
+    category: CommandBaseCategory.INFO,
     enabled: true,
     ephemeral: false,
     needsDefer: true,
