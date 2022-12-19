@@ -11,4 +11,4 @@ COPY ./tsconfig.json /server/tsconfig.json
 RUN yarn install
 RUN yarn build
 
-CMD node dist/index.js
+CMD yarn db-migrate && node dist/index.js
