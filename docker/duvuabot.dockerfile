@@ -2,11 +2,12 @@ FROM node:lts-alpine
 
 WORKDIR /server
 
-COPY ./dist/ /server/dist
+COPY ./src/ /server/src
 COPY ./package.json /server/
 COPY ./yarn.lock /server/
 COPY ./prisma/ /server/prisma
 
-RUN yarn install --prod
+RUN yarn install
+RUN yarn build
 
-CMD yarn db-migrate && node dist/index.js
+CMD node dist/index.js
