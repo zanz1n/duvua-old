@@ -1,6 +1,12 @@
+import { generate } from "./generateToken"
 import querryString from "querystring"
-import { generate } from "./generateToken.js"
-import { isoLanguageString } from "./isoLanguageString.js"
+
+export type isoLanguageString = "auto"|"af"|"sq"|"am"|"ar"|"hy"|"az"|"eu"|"be"|"bn"|"bs"|"bg"|"ca"|"ceb"
+|"ny"|"zh-cn"|"zh-tw"|"co"|"hr"|"cs"|"da"|"nl"|"en"|"eo"|"et"|"tl"|"fi"|"fr"|"fy"|"gl"|"ka"|"de"|"el"
+|"gu"|"ht"|"ha"|"haw"|"iw"|"hi"|"hmn"|"hu"|"is"|"ig"|"id"|"ga"|"it"|"ja"|"jw"|"kn"|"kk"|"km"|"ko"|"ku"|"ky"
+|"lo"|"la"|"lv"|"lt"|"lb"|"mk"|"mg"|"ms"|"ml"|"mt"|"mi"|"mr"|"mn"|"my"|"ne"|"no"|"ps"|"fa"|"pl"|"pt"
+|"pa"|"ro"|"ru"|"sm"|"gd"|"sr"|"st"|"sn"|"sd"|"si"|"sk"|"sl"|"so"|"es"|"su"|"sw"|"sv"|"tg"|"ta"
+|"te"|"th"|"tr"|"uk"|"ur"|"uz"|"vi"|"cy"|"xh"|"yi"|"yo"|"zu"
 
 export type TranslatorOptions = {
     from: isoLanguageString
@@ -8,7 +14,7 @@ export type TranslatorOptions = {
 }
 
 export class Translator {
-    async translate(text: string, options: TranslatorOptions): Promise<string> {
+    async translate(text: string, options: TranslatorOptions) {
         const baseUrl = "https://translate.google.com/translate_a/single"
 
         const token = await generate(text)
@@ -34,7 +40,6 @@ export class Translator {
             method: "POST"
         }).then(res => res.json())
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         body[0].forEach((obj: any) => {
             if (obj[0]) {
                 textResult += obj[0]

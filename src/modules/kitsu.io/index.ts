@@ -1,4 +1,4 @@
-import { Translator } from "../translator/index"
+import { Translator } from "../translator"
 import { logger } from "../logger"
 import { AnimeAttributesStatus, AnimeAttributesSubType, PrismaClient } from "@prisma/client"
 
