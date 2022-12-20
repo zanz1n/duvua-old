@@ -15,4 +15,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
-        run: export DATETIME=$(date +%s); docker login -u $D_USERNAME -p $D_PASSWORD; docker build . --file docker/duvuabot.dockerfile --tag duvua-bot:$DATETIME; docker tag duvua-bot:$DATETIME zanz1n/duvua-bot:$DATETIME; docker push zanz1n/duvua-bot:$DATETIME;
+        run: export DATETIME=$(date +%s); docker login --username=$D_USERNAME --password=$D_PASSWORD > /dev/null; docker build . --file docker/duvuabot.dockerfile --tag duvua-bot:$DATETIME; docker tag duvua-bot:$DATETIME zanz1n/duvua-bot:$DATETIME; docker push zanz1n/duvua-bot:$DATETIME;
