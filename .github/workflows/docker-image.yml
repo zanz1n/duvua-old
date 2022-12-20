@@ -2,15 +2,17 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "production" ]
+    branches: ["production"]
 
 jobs:
-
   build:
+    env:
+      D_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      D_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file docker/duvuabot.dockerfile --tag duvua-bot:$(date +%s)
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: export DATETIME=$(date +%s); docker login -u $D_USERNAME -p $D_PASSWORD; docker build . --file docker/duvuabot.dockerfile --tag duvua-bot:$DATETIME; docker tag duvua-bot:$DATETIME zanz1n/duvua-bot:$DATETIME; docker push zanz1n/duvua-bot:$DATETIME;
