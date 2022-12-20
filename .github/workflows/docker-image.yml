@@ -6,14 +6,14 @@ on:
 
 jobs:
   build:
-    env:
-      D_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      D_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-      SECRET: ${{ secrets.TEST1 }}
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
+        env:
+          D_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          D_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          SECRET: ${{ secrets.TEST1 }}
         run: export DATETIME=$(date +%s); echo "$DATETIME $SECRET"; docker login --username=$D_USERNAME --password=$D_PASSWORD; docker build . --file docker/duvuabot.dockerfile --tag duvua-bot:$DATETIME; docker tag duvua-bot:$DATETIME zanz1n/duvua-bot:$DATETIME; docker push zanz1n/duvua-bot:$DATETIME;
