@@ -8,7 +8,7 @@ async function refreshCache(client: Duvua, data: Welcome) {
 }
 
 export const command: CommandBase = {
-    category: CommandBaseCategory.CONFIG,
+    category: CommandBaseCategory.MODUTIL,
     enabled: true,
     ephemeral: false,
     needsDefer: true,

@@ -8,7 +8,7 @@ import { sMessageButton } from "../../types/discord/sMessageButton"
 import { logger } from "../../modules/logger"
 
 export const command: CommandBase = {
-    category: CommandBaseCategory.TICKET,
+    category: CommandBaseCategory.MODUTIL,
     enabled: true,
     ephemeral: false,
     needsDefer: true,

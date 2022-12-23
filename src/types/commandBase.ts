@@ -6,9 +6,9 @@ import { sInteraction } from "./discord/sInteraction"
 export enum CommandBaseCategory {
     FUN,
     INFO,
+    MODUTIL,
     MUSIC,
-    CONFIG,
-    TICKET
+    MONEYLEVEL
 }
 
 export type CommandBaseRunArg = {

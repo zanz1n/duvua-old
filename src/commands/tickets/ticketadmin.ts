@@ -4,7 +4,7 @@ import { sEmbed } from "../../types/discord/sEmbed"
 import { createMentionByUser as men } from "../../modules/createMentionByUser"
 
 export const command: CommandBase = {
-    category: CommandBaseCategory.TICKET,
+    category: CommandBaseCategory.MODUTIL,
     enabled: true,
     ephemeral: false,
     needsDefer: true,
