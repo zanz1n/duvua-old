@@ -15,28 +15,33 @@ export const command: CommandBase = {
     data: {
         name: "config",
         description: "Comandos de configuração do bot",
+        descriptionLocalizations: { "en-US": "Bot configuration commands" },
         options: [
             {
                 type: ApplicationCommandOptionType.Subcommand,
                 name: "welcome",
                 description: "Altera a mensagem de boas vindas do servidor",
+                descriptionLocalizations: { "en-US": "Change the welcome server message" },
                 options: [
                     {
                         type: ApplicationCommandOptionType.Channel,
-                        name: "canal",
+                        name: "channel",
                         description: "O canal que você deseja usar para as mensagens",
+                        descriptionLocalizations: { "en-US": "The channel that you want to use to send the messages" },
                         required: true
                     },
                     {
                         type: ApplicationCommandOptionType.String,
-                        name: "mensagem",
+                        name: "message",
                         description: "A mensagem de boas vindas que será exibida",
+                        descriptionLocalizations: { "en-US": "The welcome message that will be show" },
                         required: true
                     },
                     {
                         type: ApplicationCommandOptionType.String,
-                        name: "tipo",
+                        name: "type",
                         description: "O tipo de mensagem de boas vindas",
+                        descriptionLocalizations: { "en-US": "The welcome message type" },
                         required: true,
                         choices: [
                             {
@@ -59,11 +64,13 @@ export const command: CommandBase = {
                 type: ApplicationCommandOptionType.Subcommand,
                 name: "enablewelcome",
                 description: "Habilita ou desabilita a funcionalidade de mensagem de boas vindas",
+                descriptionLocalizations: { "en-US": "Toggle the welcome message functionality in the server" },
                 options: [
                     {
                         type: ApplicationCommandOptionType.Boolean,
-                        name: "habilitado",
-                        description: "A mensagem de boas vindas deve ser hablilitada",
+                        name: "enabled",
+                        description: "A mensagem de boas vindas deve ser hablilitada?",
+                        descriptionLocalizations: { "en-US": "Should the welcome message be enabled?" },
                         required: true
                     }
                 ]
@@ -82,21 +89,21 @@ export const command: CommandBase = {
         const subCommand = interaction.options.getSubcommand()
 
         if (subCommand == "welcome") {
-            const channel = interaction.options.getChannel("canal", true)
+            const channel = interaction.options.getChannel("channel", true)
 
             if (channel.type != ChannelType.GuildText) {
                 client.utils.createDefaultReply(interaction, "Você precisa selecionar um canal de texto válido, {USER}")
                 return
             }
 
-            const message = interaction.options.getString("mensagem", true)
+            const message = interaction.options.getString("message", true)
 
             if (message.length > 250) {
                 client.utils.createDefaultReply(interaction, "O tamanho máximo da mensagem é de 250 caratéres")
                 return
             }
 
-            const contentType = interaction.options.getString("tipo", true) as "MESSAGE" | "EMBED" | "IMAGE"
+            const contentType = interaction.options.getString("type", true) as "MESSAGE" | "EMBED" | "IMAGE"
 
             let replyMessage = ""
 
@@ -149,7 +156,7 @@ export const command: CommandBase = {
             return
         }
         else if (subCommand == "enablewelcome") {
-            const enabled = interaction.options.getBoolean("habilitado", true)
+            const enabled = interaction.options.getBoolean("enabled", true)
 
             let replyMessage = ""
 
