@@ -20,43 +20,60 @@ export class MemebrDb {
     }
 
     public async updateFromMember(member: GuildMember, data: Prisma.MemberUpdateInput) {
-        return await this.prisma.member.update({
+        return this.prisma.member.update({
             where: { MCID: `${member.guild.id}${member.user.id}` },
             data
         })
     }
 
-    public async createFromMember(member: GuildMember, data?: Prisma.MemberUpdateInput) {
-        if (data) {
-            return await this.prisma.member.create({
-                data: {
-                    MCID: `${member.guild.id}${member.user.id}`,
-                    guild: {
-                        connectOrCreate: {
-                            create: {
-                                dcId: member.guild.id
-                            },
-                            where: {
-                                dcId: member.guild.id
-                            }
-                        }
-                    },
-                    user: {
-                        connectOrCreate: {
-                            create: {
-                                dcId: member.user.id,
-                                lastDailyReq: Date.now()
-                            },
-                            where: {
-                                dcId: member.user.id
-                            }
-                        }
-                    }
-                }
-            }).then(async () => {
-                return await this.updateFromMember(member, data)
+    public async updateOrCreateMember(member: GuildMember, data: {
+        silverCoins?: number
+        XP?: number
+        level?: number
+        dj?: boolean
+        playAllowed?: boolean}
+    ) {
+        const find = await this.getFromMember(member)
+        if (find) {
+            return this.prisma.member.update({
+                where: { MCID: `${member.guild.id}${member.user.id}` },
+                data
             })
         }
+        return this.prisma.member.create({
+            data: {
+                MCID: `${member.guild.id}${member.user.id}`,
+                guild: {
+                    connectOrCreate: {
+                        create: {
+                            dcId: member.guild.id
+                        },
+                        where: {
+                            dcId: member.guild.id
+                        }
+                    }
+                },
+                user: {
+                    connectOrCreate: {
+                        create: {
+                            dcId: member.user.id,
+                            lastDailyReq: Date.now()
+                        },
+                        where: {
+                            dcId: member.user.id
+                        }
+                    }
+                },
+                silverCoins: data.silverCoins,
+                XP: data.XP,
+                level: data.level,
+                dj: data.dj,
+                playAllowed: data.playAllowed,
+            }
+        })
+    }
+
+    public async createFromMember(member: GuildMember) {
         return await this.prisma.member.create({
             data: {
                 MCID: `${member.guild.id}${member.user.id}`,
