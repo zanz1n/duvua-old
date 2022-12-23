@@ -12,10 +12,12 @@ export const command: CommandBase = {
     data: {
         name: "play",
         description: "Toca uma música do youtube",
+        descriptionLocalizations: { "en-US": "Plays a music from youtube" },
         options: [
             {
                 name: "song",
                 description: "A url ou o nome do som que deseja pesquisar",
+                descriptionLocalizations: { "en-US": "The url or name of the song you want to play" },
                 type: ApplicationCommandOptionType.String,
                 required: true
             }
