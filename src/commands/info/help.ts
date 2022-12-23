@@ -4,7 +4,7 @@ import { sEmbed } from "../../types/discord/sEmbed"
 import { sMessageButton } from "../../types/discord/sMessageButton"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 
-const loadFromCommand = async (command: CommandBase, helpEmbed: sEmbed) => {
+const loadFromCommand = (command: CommandBase, helpEmbed: sEmbed) => {
     if (command.data.options && command.data.options[0].type == ApplicationCommandOptionType.SubcommandGroup) {
         command.data.options.forEach(subCmdGrpOpt => {
             if (subCmdGrpOpt.type != ApplicationCommandOptionType.SubcommandGroup)
@@ -88,11 +88,21 @@ export const command: CommandBase = {
             }
 
             client.commands.forEach((command) => {
-                if (command.category == CommandBaseCategory.FUN) loadFromCommand(command, embeds.FUN)
-                if (command.category == CommandBaseCategory.INFO) loadFromCommand(command, embeds.INFO)
-                if (command.category == CommandBaseCategory.MODUTIL) loadFromCommand(command, embeds.MODUTIL)
-                if (command.category == CommandBaseCategory.MONEYLEVEL) loadFromCommand(command, embeds.MONEYLEVEL)
-                if (command.category == CommandBaseCategory.MUSIC) loadFromCommand(command, embeds.MUSIC)
+                if (command.category == CommandBaseCategory.FUN) {
+                    loadFromCommand(command, embeds.FUN)
+                }
+                if (command.category == CommandBaseCategory.INFO) {
+                    loadFromCommand(command, embeds.INFO)
+                }
+                if (command.category == CommandBaseCategory.MODUTIL) {
+                    loadFromCommand(command, embeds.MODUTIL)
+                }
+                if (command.category == CommandBaseCategory.MONEYLEVEL) {
+                    loadFromCommand(command, embeds.MONEYLEVEL)
+                }
+                if (command.category == CommandBaseCategory.MUSIC) {
+                    loadFromCommand(command, embeds.MUSIC)
+                }
             })
         }
         else {
