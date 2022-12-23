@@ -1,7 +1,8 @@
-import { ApplicationCommandOptionType, GuildMember, PermissionFlagsBits } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ChannelType, GuildMember, PermissionFlagsBits } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
-import { createMentionByUser as men } from "../../modules/createMentionByUser"
+import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
+import { sMessageButton } from "../../types/discord/sMessageButton"
 
 export const command: CommandBase = {
     category: CommandBaseCategory.MODUTIL,
@@ -25,6 +26,28 @@ export const command: CommandBase = {
                         description: "O usuário que deseja excluir o ticket",
                         descriptionLocalizations: { "en-US": "The user you want to delete the ticket" },
                         required: true
+                    }
+                ]
+            },
+            {
+                type: ApplicationCommandOptionType.Subcommand,
+                name: "addpermanent",
+                description: "Adiciona um botão de criação de ticket permanente num canal de texto",
+                descriptionLocalizations: { "en-US": "Creates a permanent ticket create button in a text channel" },
+                options: [
+                    {
+                        type: ApplicationCommandOptionType.Channel,
+                        name: "channel",
+                        description: "O canal para criar o botão",
+                        descriptionLocalizations: { "en-US": "The channel to create the button" },
+                        required: true
+                    },
+                    {
+                        type: ApplicationCommandOptionType.String,
+                        name: "message",
+                        description: "O texto que vai acompanhar o botão",
+                        descriptionLocalizations: { "en-US": "The text that will be shown with the button" },
+                        required: false
                     }
                 ]
             }
@@ -52,6 +75,40 @@ export const command: CommandBase = {
             client.channels.cache.get(ticketDb.channelId)?.delete()
             client.redisDba.ticket.deleteById(`${interaction.guild.id}${interaction.user.id}`)
             client.utils.createDefaultReply(interaction, `Todos os tickets de ${user.username} foram deletados`)
+        }
+        else if (subCommand == "addpermanent") {
+            const channelOpt = interaction.options.getChannel("channel", true)
+            const channel = client.channels.cache.get(channelOpt.id)
+            if (!channel || channel.type != ChannelType.GuildText) {
+                client.utils.createDefaultReply(interaction, "Selecione um canal de texto válido, {USER}")
+                return
+            }
+
+            const embed = new sEmbed()
+            
+            const message = interaction.options.getString("message")
+
+            const row = new sButtonActionRow().addComponents(
+                new sMessageButton()
+                    .setCustomId("permanent-ticket")
+                    .setEmoji("#️⃣")
+                    .setLabel("Criar Ticket")
+                    .setStyle(ButtonStyle.Primary)
+            )
+
+            if (message) {
+                embed.setDescription(message)
+                embed.setFooter({
+                    text: `Mensagem por ${interaction.user.username}`,
+                    iconURL: interaction.member.displayAvatarURL({ forceStatic: true })
+                    ?? interaction.user.displayAvatarURL({ forceStatic: true })
+                })
+            } else {
+                embed.setDescription("**Clique no botão para criar um ticket**")
+            }
+            client.utils.createDefaultReply(interaction, "Ticket permanente criado com sucesso, {USER")
+            channel.send({ embeds: [embed], components: [row] })
+            return
         }
     }
 }
