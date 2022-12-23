@@ -12,15 +12,18 @@ export const command: CommandBase = {
     data: {
         name: "facts",
         description: "Exibe curiosidades sobre números",
+        descriptionLocalizations: { "en-US": "Shows facts about numbers" },
         options: [
             {
                 type: ApplicationCommandOptionType.Subcommand,
-                name: "ano",
+                name: "year",
                 description: "Exibe curiosidades sobre um ano",
+                descriptionLocalizations: { "en-US": "Shows facts about a year" },
                 options: [
                     {
-                        name: "número",
+                        name: "number",
                         description: "O ano que você deseja saber sobre",
+                        descriptionLocalizations: { "en-US": "The year you want to know about" },
                         type: ApplicationCommandOptionType.Number,
                         required: true
                     }
@@ -28,12 +31,14 @@ export const command: CommandBase = {
             },
             {
                 type: 1,
-                name: "número",
+                name: "number",
                 description: "Exibe curiosidades sobre um número",
+                descriptionLocalizations: { "en-US": "Shows facts about a number" },
                 options: [
                     {
-                        name: "número",
+                        name: "number",
                         description: "O número que você deseja saber sobre",
+                        descriptionLocalizations: { "en-US": "The number you want to know about" },
                         type: ApplicationCommandOptionType.Number,
                         required: true
                     }
@@ -45,13 +50,13 @@ export const command: CommandBase = {
     async run({interaction, client}) {
         const subCommand = interaction.options.getSubcommand()
 
-        const number = interaction.options.getNumber("número", true).toString()
+        const number = interaction.options.getNumber("number", true).toString()
         const embedFooter: EmbedFooterData = {
             text: `Requisitado por ${interaction.user.username}`,
             iconURL: interaction.user.displayAvatarURL({ forceStatic: true })
         }
 
-        if (subCommand == "ano") {
+        if (subCommand == "year") {
             const result = await fetch(`http://numbersapi.com/${number}/year`)
                 .then(res => res.text())
                 .catch((err) => {
@@ -71,7 +76,7 @@ export const command: CommandBase = {
             })
             return
         }
-        else if (subCommand == "número") {
+        else if (subCommand == "number") {
             const result = await fetch(`http://numbersapi.com/${number}`)
                 .then(res => res.text())
                 .catch((err) => {
