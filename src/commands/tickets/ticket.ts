@@ -5,7 +5,6 @@ import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
-import { logger } from "../../modules/logger"
 
 export const command: CommandBase = {
     category: CommandBaseCategory.MODUTIL,
