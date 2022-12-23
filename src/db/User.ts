@@ -30,7 +30,7 @@ export class UserDb {
             return await this.prisma.user.create({
                 data: {
                     dcId: user.id,
-                    lastDailyReq: Date.now()
+                    lastDailyReq: Date.now().toString()
                 }
             }).then(async () => {
                 return await this.updateFromUser(user, data)
@@ -41,7 +41,7 @@ export class UserDb {
         return await this.prisma.user.create({
             data: {
                 dcId: user.id,
-                lastDailyReq: Date.now()
+                lastDailyReq: Date.now().toString()
             }
         }).then((result) => {
             return result

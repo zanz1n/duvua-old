@@ -1,7 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { GuildMember } from "discord.js"
 
-
 export class MemebrDb {
     private prisma: PrismaClient
     constructor(client: PrismaClient) { this.prisma = client }
@@ -12,10 +11,6 @@ export class MemebrDb {
                 guildId: member.guild.id,
                 AND: { userId: member.user.id }
             }
-        }).then((result) => {
-            return result
-        }).catch(() => {
-            return null
         })
     }
 
@@ -37,7 +32,13 @@ export class MemebrDb {
         if (find) {
             return this.prisma.member.update({
                 where: { MCID: `${member.guild.id}${member.user.id}` },
-                data
+                data: {
+                    silverCoins: data.silverCoins,
+                    XP: data.XP,
+                    level: data.level,
+                    dj: data.dj,
+                    playAllowed: data.playAllowed
+                }
             })
         }
         return this.prisma.member.create({
@@ -57,7 +58,7 @@ export class MemebrDb {
                     connectOrCreate: {
                         create: {
                             dcId: member.user.id,
-                            lastDailyReq: Date.now()
+                            lastDailyReq: Date.now().toString()
                         },
                         where: {
                             dcId: member.user.id
@@ -91,7 +92,7 @@ export class MemebrDb {
                     connectOrCreate: {
                         create: {
                             dcId: member.user.id,
-                            lastDailyReq: Date.now()
+                            lastDailyReq: Date.now().toString()
                         },
                         where: {
                             dcId: member.user.id

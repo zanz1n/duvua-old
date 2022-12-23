@@ -36,7 +36,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "dcId" VARCHAR(20) NOT NULL,
-    "lastDailyReq" INTEGER NOT NULL,
+    "lastDailyReq" TEXT NOT NULL,
     "job" "MemberJob" NOT NULL DEFAULT 'MENDIGO',
     "goldCoins" INTEGER NOT NULL DEFAULT 0,
 
