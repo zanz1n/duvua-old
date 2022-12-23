@@ -6,10 +6,13 @@ export const command: CommandBase = {
     data: {
         name: "avatar",
         description: "Mostra o avatar de um usuário",
+        descriptionLocalizations: { "en-US": "Show a user's avatar" },
         options: [
             {
-                name: "usuario",
+                name: "user",
+                nameLocalizations: { "pt-BR": "usuário" },
                 description: "De quem deseja exibir o avatar",
+                descriptionLocalizations: { "en-US": "Whose avatar you want to show" },
                 type: ApplicationCommandOptionType.User,
                 required: false
             }
@@ -21,8 +24,8 @@ export const command: CommandBase = {
     needsDefer: true,
     
     async run({interaction}) {
-        const user = interaction.options.getUser("usuario") ?? interaction.user
-        let member = interaction.options.getMember("usuario") ?? interaction.member
+        const user = interaction.options.getUser("user") ?? interaction.user
+        let member = interaction.options.getMember("user") ?? interaction.member
 
         if (!(member instanceof GuildMember)) member = null
         if (!user) return

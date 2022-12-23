@@ -13,15 +13,18 @@ export const command: CommandBase = {
     data: {
         name: "anime",
         description: "Pesquisa por um anime e mostra informações relevantes",
+        descriptionLocalizations: { "en-US": "Search for an anime and shows relevant information" },
         options: [
             {
                 name: "name",
                 description: "O nome do anime que deseja buscar",
+                descriptionLocalizations: { "en-US": "The name of the anime you want to search" },
                 type: ApplicationCommandOptionType.String,
                 required: true
             }
         ]
     },
+
     async run({interaction, client}) {
         if (!interaction.channel) return
         const searchName = interaction.options.getString("name", true)

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType, GuildMember, ImageURLOptions, TextChannel } from "discord.js"
+import { ApplicationCommandOptionType, ChannelType, GuildMember, ImageURLOptions } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { createMentionByUser as men } from "../../modules/createMentionByUser"
@@ -12,16 +12,19 @@ export const command: CommandBase = {
     data: {
         name: "clone",
         description: "Cria um clone de alguém",
+        descriptionLocalizations: { "en-US": "Create a clone of someone" },
         options: [
             {
                 name: "user",
                 description: "Quem você deseja fazer o clone",
+                descriptionLocalizations: { "en-US": "Who wou want to clone" },
                 type: ApplicationCommandOptionType.User,
                 required: true
             },
             {
                 name: "message",
                 description: "O que você deseja fazer o usuário enviar no canal de texto",
+                descriptionLocalizations: { "en-US": "What you want the clone to say" },
                 type: ApplicationCommandOptionType.String,
                 required: true
             }

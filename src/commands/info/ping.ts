@@ -6,6 +6,7 @@ export const command: CommandBase = {
     data: {
         name: "ping",
         description: "Mostra o ping do bot e responde com pong",
+        descriptionLocalizations: { "en-US": "Shows the bot ping and replies with pong" }
     },
     enabled: true,
     ephemeral: true,
@@ -14,7 +15,7 @@ export const command: CommandBase = {
     
     async run({interaction, client}) {
         const embed = new sEmbed()
-            .setDescription(`**Pong!**\nPing do bot: ${client.ws.ping}`)
+            .setDescription(`**Pong!**\nPing do bot: ${client.ws.ping}ms`)
 
         await interaction.reply({
             fetchReply: true,

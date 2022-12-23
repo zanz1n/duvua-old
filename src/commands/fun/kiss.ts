@@ -10,10 +10,12 @@ export const command: CommandBase = {
     data: {
         name: "kiss",
         description: "Demonstre todo o seu amor a uma pessoa benjando-a",
+        descriptionLocalizations: { "en-US": "Show all your love to a person kissing him" },
         options: [
             {
-                name: "usuario",
+                name: "user",
                 description: "A pessoa que você deseja beijar",
+                descriptionLocalizations: { "en-US": "The user you want to kiss" },
                 type: ApplicationCommandOptionType.User,
                 required: true
             }
@@ -27,7 +29,7 @@ export const command: CommandBase = {
     async run({interaction, client}) {
         const embed = new sEmbed
 
-        const user = interaction.options.getUser("usuario")
+        const user = interaction.options.getUser("user")
         if (!client.user) return
         if (!user) return
         if (!interaction.channel) return

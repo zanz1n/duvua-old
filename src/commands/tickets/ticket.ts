@@ -5,6 +5,7 @@ import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
+import { logger } from "../../modules/logger"
 
 export const command: CommandBase = {
     category: CommandBaseCategory.TICKET,
@@ -14,16 +15,19 @@ export const command: CommandBase = {
     data: {
         name: "ticket",
         description: "Comandos para a criação de tickets",
+        descriptionLocalizations: { "en-US": "Ticket realted commands" },
         options: [
             {
                 type: ApplicationCommandOptionType.Subcommand,
                 name: "create",
-                description: "Cria um ticket"
+                description: "Cria um ticket",
+                descriptionLocalizations: { "en-US": "Creates a ticket" }
             },
             {
                 type: ApplicationCommandOptionType.Subcommand,
                 name: "delete",
-                description: "Deleta seus tickets caso você tenha um"
+                description: "Deleta seus tickets caso você tenha um",
+                descriptionLocalizations: { "en-US": "Deletes a ticket in case you have one open" }
             }
         ]
     },
@@ -43,15 +47,12 @@ export const command: CommandBase = {
 
             if (findDb) {
                 const channel = interaction.guild.channels.cache.get(findDb.channelId)
-                ?? await interaction.guild.channels.fetch(findDb.channelId)
 
                 if (channel) {
                     channel.delete("Removing ticket channels")
                 }
-                Promise.all([
-                    client.redisDba.ticket.deleteById(redisIdentifier),
-                    client.utils.createDefaultReply(interaction, "Seu ticket foi deletado com sucesso, {USER}")
-                ])
+                client.redisDba.ticket.deleteById(redisIdentifier),
+                client.utils.createDefaultReply(interaction, "Seu ticket foi deletado com sucesso, {USER}")
                 return
             }
             client.utils.createDefaultReply(interaction, "Você não tem nenhum ticket criado, {USER}")
@@ -135,7 +136,7 @@ export const command: CommandBase = {
                         .setEmoji("❌")
                         .setLabel("Cancelar")
                         .setStyle(ButtonStyle.Danger)
-                    
+
                     const ticketChannelRow = new sButtonActionRow()
                         .addComponents(ticketChannelCancelButton)
 
@@ -183,7 +184,7 @@ export const command: CommandBase = {
 
                     const embed = new sEmbed()
                         .setDescription(`**Seu ticket foi criado com sucesso, ${createMentionByUser(i.user)}**`)
-                    
+
                     const goToChannelRow = new sButtonActionRow().addComponents(
                         new sMessageButton()
                             .setLabel("Ir")

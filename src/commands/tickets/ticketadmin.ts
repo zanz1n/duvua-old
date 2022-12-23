@@ -11,16 +11,19 @@ export const command: CommandBase = {
     data: {
         name: "ticketadmin",
         description: "Comandos relacionados à administração de tickets",
+        descriptionLocalizations: { "en-US": "Ticket administration related commands" },
         options: [
             {
                 type: ApplicationCommandOptionType.Subcommand,
                 name: "delete",
                 description: "Deleta o ticket de um usuário caso ele não tenha sido fechado",
+                descriptionLocalizations: { "en-US": "Deletes a user's ticket in case it has not been closed" },
                 options: [
                     {
                         type: ApplicationCommandOptionType.User,
                         name: "user",
                         description: "O usuário que deseja excluir o ticket",
+                        descriptionLocalizations: { "en-US": "The user you want to delete the ticket" },
                         required: true
                     }
                 ]
@@ -46,11 +49,9 @@ export const command: CommandBase = {
                 client.utils.createDefaultReply(interaction, `Nenhum ticket de ${user.username} foi encontrado, {USER}`)
                 return
             }
-            return Promise.all([
-                client.channels.fetch(ticketDb.channelId).then(channel => { channel?.delete() }),
-                client.redisDba.ticket.deleteById(`${interaction.guild.id}${interaction.user.id}`),
-                client.utils.createDefaultReply(interaction, `Todos os tickets de ${user.username}`)
-            ])
+            client.channels.cache.get(ticketDb.channelId)?.delete()
+            client.redisDba.ticket.deleteById(`${interaction.guild.id}${interaction.user.id}`)
+            client.utils.createDefaultReply(interaction, `Todos os tickets de ${user.username} foram deletados`)
         }
     }
 }
