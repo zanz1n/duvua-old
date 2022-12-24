@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ChannelType, Collection, GuildMember, Message, PermissionFlagsBits, TextChannel } from "discord.js"
+import { ApplicationCommandOptionType, ChannelType, Collection, GuildMember, Message, PermissionFlagsBits } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { createMentionByUser as men } from "../../modules/createMentionByUser"
@@ -63,7 +63,7 @@ export const command: CommandBase = {
             const messagesRaw = await interaction.channel.messages.fetch({ limit: amount })
             messages = new Collection<string, Message>()
             messagesRaw.forEach(msg => {
-                if (msg.deletable && msg.author.id == user.id) messages.set(msg.id, msg)
+                if (msg.deletable && msg.author.id == user.id) messages!.set(msg.id, msg)
                 else { cannotDeleteCount++ }
             })
             statusMsg = `${amount - cannotDeleteCount} mesagens de ${user.username} foram removidas do canal de texto, ${men(interaction.user)}`
