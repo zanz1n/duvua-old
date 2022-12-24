@@ -5,48 +5,70 @@ export class GuildDb {
     private prisma: PrismaClient
     constructor(client: PrismaClient) { this.prisma = client }
 
-    public async getFromGuild(guild: GuildData, welcome: boolean) {
+    public async getFromGuild(guild: GuildData, welcome?: boolean) {
+        if (!welcome) welcome = false
         return await this.prisma.guild.findFirst({
             where: { dcId: guild.id },
             include: { welcome }
         })
     }
 
-    public async updateFromGuild(guild: GuildData, data: Prisma.GuildUpdateInput, welcome: boolean) {
+    public async updateFromGuild(guild: GuildData, data: Prisma.GuildUpdateInput, welcome?: boolean) {
+        if (!welcome) welcome = false
         return await this.prisma.guild.update({
             where: { dcId: guild.id },
             data,
             include: { welcome }
-        }).then((result) => {
-            return result
-        }).catch(() => {
-            return null
         })
     }
 
-    public async createFromGuild(guild: GuildData, welcome: boolean, data?: Prisma.GuildUpdateInput) {
-        if (data) {
-            return await this.prisma.guild.create({
-                data: {
+    public async updateOrCreateGuild(guild: GuildData, data: {
+        prefix?: string
+        enableTickets?: boolean
+        musicStrictM?: boolean
+    }, welcome?: boolean) {
+        if (!welcome) welcome = false
+        const find = await this.prisma.guild.findFirst({
+            where: {
+                dcId: guild.id
+            }
+        })
+        if (find) {
+            return this.prisma.guild.update({
+                where: {
                     dcId: guild.id
                 },
+                data: {
+                    prefix: data.prefix,
+                    enableTickets: data.enableTickets,
+                    musicStrictM: data.musicStrictM
+                },
                 include: { welcome }
-            }).then(async (result) => {
-                await this.updateFromGuild(guild, data, welcome)
-                return result
             })
         }
+        return this.prisma.guild.create({
+            data: {
+                dcId: guild.id,
+                prefix: data.prefix,
+                enableTickets: data.enableTickets,
+                musicStrictM: data.musicStrictM
+            },
+            include: { welcome }
+        })
+    }
+
+    public async createFromGuild(guild: GuildData, welcome?: boolean) {
+        if (!welcome) welcome = false
         return await this.prisma.guild.create({
             data: {
                 dcId: guild.id
             },
             include: { welcome }
-        }).then((result) => {
-            return result
         })
     }
 
-    public async getOrCreateFromGuild(guild: GuildData, welcome: boolean) {
+    public async getOrCreateFromGuild(guild: GuildData, welcome?: boolean) {
+        if (!welcome) welcome = false
         const find = await this.getFromGuild(guild, welcome)
         if (find) return find
 
