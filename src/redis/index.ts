@@ -12,6 +12,8 @@ export class RedisClient extends Redis {
         this.on("error", (err) => {
             logger.error(`Redis Error: ${err}`)
         })
-        logger.info("Redis connection : " + this.auth(config.redis.password))
+        this.auth(config.redis.password).then(result => {
+            logger.info("Redis connection : " + result)
+        })
     }
 }
