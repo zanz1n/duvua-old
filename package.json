@@ -21,8 +21,7 @@
     "@prisma/client": "^4.8.0",
     "debug": "^4.3.4",
     "discord.js": "^14.7.1",
-    "ioredis": "^5.2.4",
-    "shoukaku": "^3.2.3"
+    "ioredis": "^5.2.4"
   },
   "devDependencies": {
     "@types/debug": "^4.1.7",

@@ -15,7 +15,6 @@ import { eventsData } from "./modules/loadEvents"
 import { CommandBase } from "./types/commandBase"
 import { Kitsu } from "./modules/kitsu.io/index"
 import { Translator } from "./modules/translator"
-import { Shoukaku, Connectors, Track } from "shoukaku"
 import { RedisDba } from "./redis/dba/index"
 import { ClientUtils } from "./modules/ClientUtils"
 import { QueueManager } from "./modules/Queue"
@@ -27,10 +26,6 @@ export class Duvua extends Client {
     events: EventBase[]
 
     prisma: PrismaClient
-
-    music: Shoukaku
-
-    musicQueues: QueueManager<Track>
 
     dba: Dba
 
@@ -69,15 +64,6 @@ export class Duvua extends Client {
         this.redis = new RedisClient()
         this.redisDba = new RedisDba(this.redis)
         this.utils = new ClientUtils()
-        this.musicQueues = new QueueManager<Track>()
-
-        this.music = new Shoukaku(new Connectors.DiscordJS(this), [
-            {
-                name: "LocalNode",
-                url: `${config.lavalink.host}:${config.lavalink.port.toString()}`,
-                auth: config.lavalink.password
-            }
-        ])
 
         this.kitsu = new Kitsu(this.prisma, this.translator, this.redis)
 

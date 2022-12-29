@@ -13,15 +13,22 @@ export const event: EventBase = {
     async run(interaction: Interaction, client: Duvua) {
         if (interaction.isCommand()) {
             let dateStart: number | null = null
-            // eslint-disable-next-line no-var
             if (config.debugMode) dateStart = Date.now()
+            
+            let prohibitedExecution = false
+            const otherInstanceCommand = ["play", "pause", "stop", "resume", "join", "leave", "track"]
+            otherInstanceCommand.forEach(a => {
+                if (interaction.commandName == a) prohibitedExecution = true
+            })
+            if (prohibitedExecution) return
+
             if (!(interaction.member instanceof GuildMember)) return
-    
+
             const cmd = client.commands.get(interaction.commandName)
             if (!cmd) return
-    
+
             if (cmd.needsDefer) await interaction.deferReply({ ephemeral: cmd.ephemeral })
-    
+
             await cmd.run({ interaction: interaction as sInteraction, client }).catch(e => logger.error(e))
 
             if (config.debugMode && dateStart) logger.debug(`[commandTimer] - ${cmd.data.name}: ${Date.now() - dateStart}ms`)
