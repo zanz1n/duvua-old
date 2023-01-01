@@ -48,7 +48,7 @@ export class AnimeData {
         this.createdAt = data.createdAt
         this.updatedAt = data.updatedAt
         this.slug = data.slug
-        this.synopsis = data.synopsisEn
+        this.synopsis = data.synopsis == "" || !data.synopsis ? data.synopsisEn : data.synopsis
         this.coverImageTopOffset = data.coverImageTopOffset ?? null
         this.titles = {
             en: data.titles_en ?? null,

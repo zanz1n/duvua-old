@@ -53,7 +53,7 @@ export class Kitsu {
                     if (!bl) {
                         newBlackList = []
                     } else {
-                        newBlackList = (JSON.parse(bl) as string[])
+                        newBlackList = JSON.parse(bl) as string[]
                     }
                     newBlackList.push(nameQuery)
                     await this.redis.set("anime-name-query-blacklist", JSON.stringify(newBlackList), "EX", 600)
@@ -72,6 +72,15 @@ export class Kitsu {
             }
         })
 
+        let synopsis = ""
+
+        await this.translator.translate(attributes.synopsis, {
+            from: "en",
+            to: "pt"
+        }).then(result => {
+            synopsis = result
+        }).catch((err) => { logger.error(err) })
+
         const genres: string[] = [];
 
         (await genresData).data.forEach(dt => genres.push(dt.attributes.name ?? ""))
@@ -83,7 +92,7 @@ export class Kitsu {
                     // THIS SYNTAX CAUSE AN UNEXPECTED BUG EVEN IF NON EQUAL PROPRERTIES OVERWRITEN
                     // ...attributes,
                     kitsuId: data.data[0].id,
-                    synopsis: "",
+                    synopsis,
                     synopsisEn: attributes.synopsis,
                     coverImage_large: attributes.coverImage?.large,
                     coverImage_meta: attributes.coverImage?.meta ? JSON.stringify(attributes.coverImage.meta) : null,
