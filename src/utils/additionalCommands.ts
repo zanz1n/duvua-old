@@ -24,5 +24,10 @@ export const additionalCommands: ChatInputApplicationCommandData[]  = [
         name: "track",
         description: "Mostra informações sobre o som que está tocando",
         descriptionLocalizations: { "en-US": "Shows info about the current playing song" },
+    },
+    {
+        name: "queue",
+        description: "Mostra informações sobre a playlist",
+        descriptionLocalizations: { "en-US": "Shows info about the playlist" },
     }
 ]
