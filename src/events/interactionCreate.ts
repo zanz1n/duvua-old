@@ -5,6 +5,7 @@ import { sInteraction } from "../types/discord/sInteraction"
 import { logger } from "../modules/logger"
 import { config } from "../config"
 import { permanentTicketHandler } from "../utils/permanentTicketHandler"
+import { additionalCommands } from "../utils/additionalCommands"
 
 export const event: EventBase = {
     name: Events.InteractionCreate,
@@ -16,9 +17,8 @@ export const event: EventBase = {
             if (config.debugMode) dateStart = Date.now()
             
             let prohibitedExecution = false
-            const otherInstanceCommand = ["play", "pause", "stop", "resume", "join", "leave", "track"]
-            otherInstanceCommand.forEach(a => {
-                if (interaction.commandName == a) prohibitedExecution = true
+            additionalCommands.forEach(acmd => {
+                if (interaction.commandName == acmd.name) prohibitedExecution = true
             })
             if (prohibitedExecution) return
 
