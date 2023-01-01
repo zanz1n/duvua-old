@@ -11,10 +11,4 @@ export const config = new (class {
         port: Number(process.env.F_REDIS_PORT) ?? 6379,
         password: process.env.F_REDIS_PASSWORD ?? ""
     }
-
-    lavalink = {
-        host: process.env.LAVALINK_HOST ?? "lavalink",
-        port: Number(process.env.LAVALINK_PORT) ?? 2333,
-        password: process.env.LAVALINK_PASSWORD ?? "",
-    }
 })
