@@ -5,5 +5,4 @@ node_modules
 .docker-volumes
 dist
 **/*.log
-docker/Lavalink.jar
 coverage/
