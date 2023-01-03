@@ -37,6 +37,18 @@ services:
       DEBUG: "bot*"
       NODE_NO_WARNINGS: 1
 
+  duvuamusic:
+    container_name: duvuamusic
+    build:
+      context: ./docker/
+      dockerfile: duvuamusic.dockerfile
+    env_file:
+      - .env
+    networks:
+      - botjs
+    depends_on:
+      - postgresql
+
   postgresql:
     container_name: postgresql
     image: postgres:alpine
