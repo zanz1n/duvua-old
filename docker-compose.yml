@@ -22,6 +22,7 @@ services:
   #     - 5555:5555
 
   nodejs:
+    restart: always
     container_name: nodejs
     build:
       context: .
@@ -38,6 +39,7 @@ services:
       NODE_NO_WARNINGS: 1
 
   duvuamusic:
+    restart: always
     container_name: duvuamusic
     build:
       context: ./docker/
@@ -50,6 +52,7 @@ services:
       - postgresql
 
   postgresql:
+    restart: always
     container_name: postgresql
     image: postgres:alpine
     volumes:
@@ -62,6 +65,7 @@ services:
       - 25432:5432
 
   redisdb:
+    restart: always
     container_name: redisdb
     image: redis:alpine
     command: redis-server --save 60 1 --loglevel warning --requirepass "${F_REDIS_PASSWORD}"
