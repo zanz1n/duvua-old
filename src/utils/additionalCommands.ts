@@ -53,5 +53,10 @@ export const additionalCommands: ChatInputApplicationCommandData[]  = [
                 required: true
             }
         ]
+    },
+    {
+        name: "skip",
+        description: "Pula a música que está tocando",
+        descriptionLocalizations: { "en-US": "Skips the current playing music" },
     }
 ]
