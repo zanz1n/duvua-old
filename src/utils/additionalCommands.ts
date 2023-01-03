@@ -3,8 +3,8 @@ import { ApplicationCommandOptionType, ChatInputApplicationCommandData } from "d
 export const additionalCommands: ChatInputApplicationCommandData[]  = [
     {
         name: "play",
-        description: "Toca uma música do youtube",
-        descriptionLocalizations: { "en-US": "Plays a music from youtube" },
+        description: "Toca uma música",
+        descriptionLocalizations: { "en-US": "Plays a music" },
         options: [
             {
                 name: "song",
@@ -39,5 +39,19 @@ export const additionalCommands: ChatInputApplicationCommandData[]  = [
         name: "resume",
         description: "Despausa a música que está tocando",
         descriptionLocalizations: { "en-US": "Resumes the current playing music" },
+    },
+    {
+        name: "volume",
+        description: "Altera o volume da playlist que está tocando",
+        descriptionLocalizations: { "en-US": "Changes the volume of the currently playling playlist" },
+        options: [
+            {
+                name: "target",
+                description: "O volume que deseja definir",
+                descriptionLocalizations: { "en-US": "The volume you want to set" },
+                type: ApplicationCommandOptionType.Integer,
+                required: true
+            }
+        ]
     }
 ]
