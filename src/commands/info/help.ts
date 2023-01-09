@@ -1,18 +1,19 @@
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ChatInputApplicationCommandData, ComponentType } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sMessageButton } from "../../types/discord/sMessageButton"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
+import { additionalCommands } from "../../utils/additionalCommands"
 
-const loadFromCommand = (command: CommandBase, helpEmbed: sEmbed) => {
-    if (command.data.options && command.data.options[0].type == ApplicationCommandOptionType.SubcommandGroup) {
-        command.data.options.forEach(subCmdGrpOpt => {
+const loadFromCommand = (command: ChatInputApplicationCommandData, helpEmbed: sEmbed) => {
+    if (command.options && command.options[0].type == ApplicationCommandOptionType.SubcommandGroup) {
+        command.options.forEach(subCmdGrpOpt => {
             if (subCmdGrpOpt.type != ApplicationCommandOptionType.SubcommandGroup)
                 throw new Error("Command data probably invalid")
             if (subCmdGrpOpt.options && subCmdGrpOpt.options[0].type == ApplicationCommandOptionType.Subcommand) {
                 subCmdGrpOpt.options.forEach(subCmdOpt => {
                     helpEmbed.addFields({
-                        name: command.data.name +" "+ subCmdGrpOpt.name +" "+ subCmdOpt.name,
+                        name: command.name +" "+ subCmdGrpOpt.name +" "+ subCmdOpt.name,
                         value: subCmdOpt.description,
                         inline: true
                     })
@@ -20,17 +21,17 @@ const loadFromCommand = (command: CommandBase, helpEmbed: sEmbed) => {
             }
         })
     }
-    else if (command.data.options && command.data.options[0].type == ApplicationCommandOptionType.Subcommand) {
-        command.data.options.forEach(subCmdOpt => {
+    else if (command.options && command.options[0].type == ApplicationCommandOptionType.Subcommand) {
+        command.options.forEach(subCmdOpt => {
             helpEmbed.addFields({
-                name: command.data.name +" "+ subCmdOpt.name,
+                name: command.name +" "+ subCmdOpt.name,
                 value: subCmdOpt.description,
                 inline: true
             })
         })
     } else helpEmbed.addFields({
-        name: command.data.name,
-        value: command.data.description,
+        name: command.name,
+        value: command.description,
         inline: true
     })
 }
@@ -88,21 +89,11 @@ export const command: CommandBase = {
             }
 
             client.commands.forEach((command) => {
-                if (command.category == CommandBaseCategory.FUN) {
-                    loadFromCommand(command, embeds.FUN)
-                }
-                if (command.category == CommandBaseCategory.INFO) {
-                    loadFromCommand(command, embeds.INFO)
-                }
-                if (command.category == CommandBaseCategory.MODUTIL) {
-                    loadFromCommand(command, embeds.MODUTIL)
-                }
-                if (command.category == CommandBaseCategory.MONEYLEVEL) {
-                    loadFromCommand(command, embeds.MONEYLEVEL)
-                }
-                if (command.category == CommandBaseCategory.MUSIC) {
-                    loadFromCommand(command, embeds.MUSIC)
-                }
+                loadFromCommand(command.data, embeds[command.category])
+            })
+
+            additionalCommands.forEach((acmd) => {
+                loadFromCommand(acmd, embeds.MUSIC)
             })
         }
         else {

@@ -4,11 +4,11 @@ import { sInteraction } from "./discord/sInteraction"
 // import type { Class } from "type-fest"
 
 export enum CommandBaseCategory {
-    FUN,
-    INFO,
-    MODUTIL,
-    MUSIC,
-    MONEYLEVEL
+    FUN = "FUN",
+    INFO = "INFO",
+    MODUTIL = "MODUTIL",
+    MUSIC = "MUSIC",
+    MONEYLEVEL = "MONEYLEVEL"
 }
 
 export type CommandBaseRunArg = {
