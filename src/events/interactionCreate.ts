@@ -4,7 +4,7 @@ import { EventBase } from "../types/eventBase"
 import { sInteraction } from "../types/discord/sInteraction"
 import { logger } from "../modules/logger"
 import { config } from "../config"
-import { permanentTicketHandler } from "../utils/permanentTicketHandler"
+import { ticketCreationHandler } from "../commands/tickets/ticket"
 import { additionalCommands } from "../utils/additionalCommands"
 
 export const event: EventBase = {
@@ -35,7 +35,7 @@ export const event: EventBase = {
         }
         else if (interaction.isButton()) {
             if (interaction.customId == "permanent-ticket") {
-                permanentTicketHandler({client, i: interaction})
+                ticketCreationHandler({client, i: interaction, pre: false})
             }
         }
     }

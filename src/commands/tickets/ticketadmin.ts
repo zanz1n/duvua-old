@@ -106,7 +106,7 @@ export const command: CommandBase = {
             } else {
                 embed.setDescription("**Clique no botão para criar um ticket**")
             }
-            client.utils.createDefaultReply(interaction, "Ticket permanente criado com sucesso, {USER")
+            client.utils.createDefaultReply(interaction, "Ticket permanente criado com sucesso, {USER}")
             channel.send({ embeds: [embed], components: [row] })
             return
         }

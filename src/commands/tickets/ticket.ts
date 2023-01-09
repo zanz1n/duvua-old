@@ -1,10 +1,139 @@
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType, GuildBasedChannel, GuildMember } from "discord.js"
+import { ApplicationCommandOptionType, ButtonInteraction, ButtonStyle, ComponentType, GuildMember, PermissionFlagsBits } from "discord.js"
 import { createMentionByUser } from "../../modules/createMentionByUser"
 import { sleep } from "../../modules/sleep"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sButtonActionRow } from "../../types/discord/sMessageActionRow"
 import { sMessageButton } from "../../types/discord/sMessageButton"
+import { Duvua } from "../../Client"
+import { logger } from "../../modules/logger"
+import { TicketData } from "../../redis/dba/Ticket"
+
+export async function ticketCreationHandler({i, client, pre}: { i: ButtonInteraction, client: Duvua, pre: boolean }) {
+
+    if (!i.guild) return
+
+    const redisIdentifier = `${i.guild.id}${i.user.id}`
+
+    let findTicketDb: TicketData | null = null
+
+    if (!pre) {
+        findTicketDb = await client.redisDba.ticket.getById(redisIdentifier)
+    }
+
+    if (findTicketDb) {
+        const channel = client.channels.cache.get(findTicketDb.channelId)
+        if (!channel) {
+            client.redisDba.ticket.deleteById(redisIdentifier)
+        } else {
+            i.reply({
+                ephemeral: true,
+                embeds: [sEmbed.utils.defaultMessage(`Você já tem um ticket criado, ${createMentionByUser(i.user)}`)]
+            })
+            return
+        }
+    }
+
+    const dateNow = Date.now()
+
+    const channel = await i.guild!.channels.create({
+        name: `ticket-${i.user.tag}`,
+        permissionOverwrites: [
+            {
+                id: i.user.id,
+                allow: ["SendMessages", "ViewChannel"]
+            },
+            {
+                id: i.client.user.id,
+                allow: ["SendMessages", "ViewChannel"]
+            },
+            {
+                id: i.guild!.roles.everyone,
+                deny: ["SendMessages", "ViewChannel"]
+            }
+        ]
+    })
+
+    const dbCreation = client.redisDba.ticket.create({
+        id: redisIdentifier,
+        enabled: true,
+        channelId: channel.id
+    })
+
+    const ticketChannelEmbed = new sEmbed()
+        .setDescription("**Seu ticket foi criado aqui, clique no botão a baixo caso " +
+        "deseje deletá-lo, ou use o comando** `/ticket delete`\n" +
+        "Administradores podem usar o comando `/ticketadmin delete <usuário>`")
+
+    const ticketChannelCancelButton = new sMessageButton()
+        .setCustomId(`cancel-ticket${dateNow}`)
+        .setEmoji("❌")
+        .setLabel("Cancelar")
+        .setStyle(ButtonStyle.Danger)
+
+    const ticketChannelRow = new sButtonActionRow()
+        .addComponents(ticketChannelCancelButton)
+
+    const ticketChannelCollector = channel.createMessageComponentCollector({
+        componentType: ComponentType.Button,
+        filter: (btnint) => btnint.user.id == i.user.id ||
+            btnint.member.permissions.has(PermissionFlagsBits.Administrator),
+        max: 1,
+        time: 600000
+    })
+
+    const ticketChannelMessage = channel.send({
+        content: createMentionByUser(i.user),
+        embeds: [ticketChannelEmbed],
+        components: [ticketChannelRow]
+    })
+
+    ticketChannelCollector.on("collect", async (tci) => {
+        if (tci.customId == `cancel-ticket${dateNow}`) {
+            const data = await dbCreation
+
+            const channel = tci.guild!.channels.cache.get(data.channelId)
+            ?? await tci.guild!.channels.fetch(data.channelId)
+
+            if (channel) {
+                tci.deferUpdate()
+                sleep(1000).then(() => {
+                    Promise.all([
+                        channel.delete("Removing ticket channels"),
+                        client.redisDba.ticket.deleteById(redisIdentifier)
+                    ])
+                })
+            }
+            return
+        }
+    })
+
+    ticketChannelCollector.on("end", async () => {
+        ticketChannelCancelButton.setDisabled(true)
+        ticketChannelMessage.then(msg => msg.edit({
+            components: [ticketChannelRow]
+        })).catch(() => {
+            // Channel was already deleted
+        })
+    })
+
+    const embed = new sEmbed()
+        .setDescription(`**Seu ticket foi criado com sucesso, ${createMentionByUser(i.user)}**`)
+
+    const goToChannelRow = new sButtonActionRow().addComponents(
+        new sMessageButton()
+            .setLabel("Ir")
+            .setEmoji("🚀")
+            .setStyle(ButtonStyle.Link)
+            .setURL(`https://discord.com/channels/${i.guild!.id}/${channel.id}`)
+    )
+
+    i.reply({
+        embeds: [embed],
+        components: [goToChannelRow],
+        ephemeral: true
+    })
+}
 
 export const command: CommandBase = {
     category: CommandBaseCategory.MODUTIL,
@@ -62,8 +191,13 @@ export const command: CommandBase = {
             const findTicketDb = await client.redisDba.ticket.getById(redisIdentifier)
 
             if (findTicketDb) {
-                client.utils.createDefaultReply(interaction, "Você já tem um ticket criado, {USER}")
-                return
+                const channel = client.channels.cache.get(findTicketDb.channelId)
+                if (!channel) {
+                    client.redisDba.ticket.deleteById(redisIdentifier)
+                } else {
+                    client.utils.createDefaultReply(interaction, "Você já tem um ticket criado, {USER}")
+                    return
+                }
             }
 
             const dateNow = Date.now()
@@ -102,102 +236,10 @@ export const command: CommandBase = {
             })
 
             confirmationCollector.on("collect", async (i) => {
+                logger.info(i.customId)
                 if (i.customId == `ticket-yes${dateNow}`) {
-                    const channel = await interaction.guild!.channels.create({
-                        name: `ticket-${interaction.user.tag}`,
-                        permissionOverwrites: [
-                            {
-                                id: interaction.user.id,
-                                allow: ["SendMessages", "ViewChannel"]
-                            },
-                            {
-                                id: interaction.client.user.id,
-                                allow: ["SendMessages", "ViewChannel"]
-                            },
-                            {
-                                id: interaction.guild!.roles.everyone,
-                                deny: ["SendMessages", "ViewChannel"]
-                            }
-                        ]
-                    })
-
-                    const dbCreation = client.redisDba.ticket.create({
-                        id: redisIdentifier,
-                        enabled: true,
-                        channelId: channel.id
-                    })
-
-                    const ticketChannelEmbed = new sEmbed()
-                        .setDescription("**Seu ticket foi criado aqui, clique no botão a baixo caso deseje deletá-lo**")
-
-                    const ticketChannelCancelButton = new sMessageButton()
-                        .setCustomId(`cancel-ticket${dateNow}`)
-                        .setEmoji("❌")
-                        .setLabel("Cancelar")
-                        .setStyle(ButtonStyle.Danger)
-
-                    const ticketChannelRow = new sButtonActionRow()
-                        .addComponents(ticketChannelCancelButton)
-
-                    const ticketChannelCollector = channel.createMessageComponentCollector({
-                        componentType: ComponentType.Button,
-                        filter: (btnint) => btnint.user.id == interaction.user.id,
-                        max: 1,
-                        time: 1000 * 120
-                    })
-
-                    const ticketChannelMessage = channel.send({
-                        content: createMentionByUser(interaction.user),
-                        embeds: [ticketChannelEmbed],
-                        components: [ticketChannelRow]
-                    })
-
-                    ticketChannelCollector.on("collect", async (tci) => {
-                        if (tci.customId == `cancel-ticket${dateNow}`) {
-                            const data = await dbCreation
-
-                            const channel = tci.guild!.channels.cache.get(data.channelId)
-                            ?? await tci.guild!.channels.fetch(data.channelId)
-
-                            if (channel) {
-                                tci.deferUpdate()
-                                sleep(1000).then(() => {
-                                    Promise.all([
-                                        channel.delete("Removing ticket channels"),
-                                        client.redisDba.ticket.deleteById(redisIdentifier)
-                                    ])
-                                })
-                            }
-                            return
-                        }
-                    })
-
-                    ticketChannelCollector.on("end", async () => {
-                        ticketChannelCancelButton.setDisabled(true)
-                        ticketChannelMessage.then(msg => msg.edit({
-                            components: [ticketChannelRow]
-                        })).catch(() => {
-                            // Channel was already deleted
-                        })
-                    })
-
-                    const embed = new sEmbed()
-                        .setDescription(`**Seu ticket foi criado com sucesso, ${createMentionByUser(i.user)}**`)
-
-                    const goToChannelRow = new sButtonActionRow().addComponents(
-                        new sMessageButton()
-                            .setLabel("Ir")
-                            .setEmoji("🚀")
-                            .setStyle(ButtonStyle.Link)
-                            .setURL(`https://discord.com/channels/${interaction.guild!.id}/${channel.id}`)
-                    )
-
-                    i.reply({
-                        embeds: [embed],
-                        components: [goToChannelRow],
-                        ephemeral: true
-                    })
-
+                    logger.info(i.customId)
+                    await ticketCreationHandler({i, client, pre: true})
                 }
                 if (i.customId == `ticket-no${dateNow}`) {
                     const embed = new sEmbed()
