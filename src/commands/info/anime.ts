@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle, ComponentType } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ChannelType, ComponentType } from "discord.js"
 import { createMentionByUser as men } from "../../modules/createMentionByUser"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
@@ -59,24 +59,25 @@ export const command: CommandBase = {
                 .setLabel("Ver Sinopse Completa")
             components.push(new sButtonActionRow().addComponents(button))
 
-            const collector = await interaction.channel.createMessageComponentCollector({
-                componentType: ComponentType.Button,
-                filter: (bntint) => bntint.user.id == interaction.user.id,
-                max: 1,
-                time: 20000
-            })
-
-            collector.on("collect", async (i) => {
-                if (i.customId == `full-synopsis${dateNow}`) {
-                    i.reply(`\`${data.synopsis}\``)
-                }
-            })
-
-            collector.on("end", async () => {
-                button.setDisabled(true)
-                interaction.editReply({ components })
-            })
-
+            if (interaction.channel.type == ChannelType.GuildText) {
+                const collector = await interaction.channel.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    filter: (bntint) => bntint.user.id == interaction.user.id,
+                    max: 1,
+                    time: 20000
+                })
+    
+                collector.on("collect", async (i) => {
+                    if (i.customId == `full-synopsis${dateNow}`) {
+                        i.reply(`\`${data.synopsis}\``)
+                    }
+                })
+    
+                collector.on("end", async () => {
+                    button.setDisabled(true)
+                    interaction.editReply({ components })
+                })
+            }
         }
 
         embed.addFields([

@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, ButtonStyle, ChatInputApplicationCommandData, ComponentType } from "discord.js"
+import { ApplicationCommandOptionType, ButtonStyle, ChannelType, ChatInputApplicationCommandData, ComponentType } from "discord.js"
 import { CommandBase, CommandBaseCategory } from "../../types/commandBase"
 import { sEmbed } from "../../types/discord/sEmbed"
 import { sMessageButton } from "../../types/discord/sMessageButton"
@@ -135,46 +135,48 @@ export const command: CommandBase = {
         const row = new sButtonActionRow()
             .addComponents(buttons.FUN, buttons.INFO, buttons.MODUTIL, buttons.MUSIC, buttons.MONEYLEVEL)
 
-        const collector = interaction.channel.createMessageComponentCollector({
-            componentType: ComponentType.Button,
-            filter: (slint) => slint.user.id == interaction.user.id,
-            time: 60000
-        })
+        if (interaction.channel.type == ChannelType.GuildText) {
+            const collector = interaction.channel.createMessageComponentCollector({
+                componentType: ComponentType.Button,
+                filter: (slint) => slint.user.id == interaction.user.id,
+                time: 60000
+            })
 
-        collector.on("collect", async (i) => {
-            switch (i.customId) {
-            case `fun${dateNow}`:
-                i.deferUpdate()
-                interaction.editReply({ embeds: [embeds.FUN] })
-                break
-            case `info${dateNow}`:
-                i.deferUpdate()
-                interaction.editReply({ embeds: [embeds.INFO] })
-                break
-            case `mod-util${dateNow}`:
-                i.deferUpdate()
-                interaction.editReply({ embeds: [embeds.MODUTIL] })
-                break
-            case `music${dateNow}`:
-                i.deferUpdate()
-                interaction.editReply({ embeds: [embeds.MUSIC] })
-                break
-            case `money${dateNow}`:
-                i.deferUpdate()
-                interaction.editReply({ embeds: [embeds.MONEYLEVEL] })
-                break
-            }
-        })
-
-        collector.on("end", () => {
-            buttons.FUN.setDisabled(true)
-            buttons.INFO.setDisabled(true)
-            buttons.MODUTIL.setDisabled(true)
-            buttons.MONEYLEVEL.setDisabled(true)
-            buttons.MUSIC.setDisabled(true)
-
-            interaction.editReply({ components: [row] })
-        })
+            collector.on("collect", async (i) => {
+                switch (i.customId) {
+                case `fun${dateNow}`:
+                    i.deferUpdate()
+                    interaction.editReply({ embeds: [embeds.FUN] })
+                    break
+                case `info${dateNow}`:
+                    i.deferUpdate()
+                    interaction.editReply({ embeds: [embeds.INFO] })
+                    break
+                case `mod-util${dateNow}`:
+                    i.deferUpdate()
+                    interaction.editReply({ embeds: [embeds.MODUTIL] })
+                    break
+                case `music${dateNow}`:
+                    i.deferUpdate()
+                    interaction.editReply({ embeds: [embeds.MUSIC] })
+                    break
+                case `money${dateNow}`:
+                    i.deferUpdate()
+                    interaction.editReply({ embeds: [embeds.MONEYLEVEL] })
+                    break
+                }
+            })
+    
+            collector.on("end", () => {
+                buttons.FUN.setDisabled(true)
+                buttons.INFO.setDisabled(true)
+                buttons.MODUTIL.setDisabled(true)
+                buttons.MONEYLEVEL.setDisabled(true)
+                buttons.MUSIC.setDisabled(true)
+    
+                interaction.editReply({ components: [row] })
+            })
+        }
 
         interaction.editReply({
             content: null,

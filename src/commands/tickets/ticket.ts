@@ -8,6 +8,7 @@ import { sMessageButton } from "../../types/discord/sMessageButton"
 import { Duvua } from "../../Client"
 import { logger } from "../../modules/logger"
 import { TicketData } from "../../redis/dba/Ticket"
+import { ChannelType } from "discord.js"
 
 export async function ticketCreationHandler({i, client, pre}: { i: ButtonInteraction, client: Duvua, pre: boolean }) {
 
@@ -222,39 +223,41 @@ export const command: CommandBase = {
             const confirmationEmbed = new sEmbed()
                 .setDescription(`**Você realmente deseja criar o ticket, ${createMentionByUser(interaction.user)}?**`)
 
-            const confirmationCollector = interaction.channel.createMessageComponentCollector({
-                componentType: ComponentType.Button,
-                filter: (bntint) => bntint.user.id == interaction.user.id,
-                max: 1,
-                time: 1000 * 20
-            })
+            if (interaction.channel.type == ChannelType.GuildText) {
+                const confirmationCollector = interaction.channel.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    filter: (bntint) => bntint.user.id == interaction.user.id,
+                    max: 1,
+                    time: 1000 * 20
+                })
+
+                confirmationCollector.on("collect", async (i) => {
+                    logger.info(i.customId)
+                    if (i.customId == `ticket-yes${dateNow}`) {
+                        logger.info(i.customId)
+                        await ticketCreationHandler({i, client, pre: true})
+                    }
+                    if (i.customId == `ticket-no${dateNow}`) {
+                        const embed = new sEmbed()
+                            .setDescription(`**Seu ticket foi cancelado com sucesso, ${createMentionByUser(interaction.user)}**`)
+                        i.reply({ embeds: [embed] })
+                    }
+                })
+    
+                confirmationCollector.on("end", async () => {
+                    confirmCreation.setDisabled(true)
+                    cancelCreation.setDisabled(true)
+    
+                    await interaction.editReply({
+                        components: [confirmationRow]
+                    })
+                })
+            }
 
             await interaction.editReply({
                 content: null,
                 components: [confirmationRow],
                 embeds: [confirmationEmbed]
-            })
-
-            confirmationCollector.on("collect", async (i) => {
-                logger.info(i.customId)
-                if (i.customId == `ticket-yes${dateNow}`) {
-                    logger.info(i.customId)
-                    await ticketCreationHandler({i, client, pre: true})
-                }
-                if (i.customId == `ticket-no${dateNow}`) {
-                    const embed = new sEmbed()
-                        .setDescription(`**Seu ticket foi cancelado com sucesso, ${createMentionByUser(interaction.user)}**`)
-                    i.reply({ embeds: [embed] })
-                }
-            })
-
-            confirmationCollector.on("end", async () => {
-                confirmCreation.setDisabled(true)
-                cancelCreation.setDisabled(true)
-
-                await interaction.editReply({
-                    components: [confirmationRow]
-                })
             })
         }
     }
