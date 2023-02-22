@@ -79,8 +79,7 @@ export async function ticketCreationHandler({i, client, pre}: { i: ButtonInterac
         componentType: ComponentType.Button,
         filter: (btnint) => btnint.user.id == i.user.id ||
             btnint.member.permissions.has(PermissionFlagsBits.Administrator),
-        max: 1,
-        time: 600000
+        max: 1
     })
 
     const ticketChannelMessage = channel.send({
