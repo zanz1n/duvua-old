@@ -36,7 +36,7 @@ export const command: CommandBase = {
             throw new Error("!interaction.member || !(interaction.member instanceof GuildMember)")
 
         if (!interaction.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-            client.utils.createDefaultReply(interaction, "Você não tem permissão para usar esse comando, {USER}")
+            await client.utils.createDefaultReply(interaction, "Você não tem permissão para usar esse comando, {USER}")
             return
         }
         if (!interaction.channel || interaction.channel.type != ChannelType.GuildText) return
@@ -44,7 +44,7 @@ export const command: CommandBase = {
         const amount = interaction.options.getInteger("amount", true)
 
         if (amount > 99) {
-            client.utils.createDefaultReply(interaction, "O maximo de mensagens que podem ser deletadas é 99, {USER}")
+            await client.utils.createDefaultReply(interaction, "O maximo de mensagens que podem ser deletadas é 99, {USER}")
             return
         }
 
@@ -61,7 +61,7 @@ export const command: CommandBase = {
         } else {
             let cannotDeleteCount = 0
             const messagesRaw = await interaction.channel.messages.fetch({ limit: amount })
-            messages = new Collection<string, Message>()
+            messages = new Collection<string, Message<true>>()
             messagesRaw.forEach(msg => {
                 if (msg.deletable && msg.author.id == user.id) messages!.set(msg.id, msg)
                 else { cannotDeleteCount++ }
@@ -72,7 +72,7 @@ export const command: CommandBase = {
 
         const embed = sEmbed.utils.defaultMessage(statusMsg)
 
-        interaction.reply({
+        await interaction.reply({
             fetchReply: true,
             embeds: [embed],
             ephemeral: true
