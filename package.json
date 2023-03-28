@@ -1,40 +1,40 @@
 {
   "name": "duvua-bot",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "author": "zanz1n",
-  "type": "commonjs",
+  "type": "module",
   "repository": "https://github.com/zanz1n/duvua-bot.git",
+  "engines": {
+    "node": ">=16.13.0"
+  },
+  "author": "Izan Rodrigues <izanrodrigues999@gmail.com>",
   "scripts": {
-    "db-migrate": "prisma db push",
     "build": "tsc",
-    "prod": "node dist/index.js",
-    "lint": "eslint --ext .ts src/",
-    "fix": "eslint --fix --ext .ts src/",
-    "dev-start": "sucrase-node src/index.ts",
-    "dev": "ts-node-dev src/index.ts",
-    "test": "jest",
-    "watch": "tsc -w"
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "dev": "nodemon --watch 'src/' --watch '.env' run.cjs -e ts",
+    "start": "node dist/index.js"
   },
-  "license": "MIT",
-  "dependencies": {
-    "@prisma/client": "^4.8.0",
-    "debug": "^4.3.4",
-    "discord.js": "^14.7.1",
-    "ioredis": "^5.2.4"
-  },
+  "keywords": [],
+  "license": "ISC",
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/jest": "^29.2.4",
-    "@types/node": "^18.11.17",
-    "@typescript-eslint/eslint-plugin": "^5.47.0",
-    "@typescript-eslint/parser": "^5.47.0",
-    "eslint": "^8.30.0",
-    "jest": "^29.3.1",
-    "prisma": "^4.8.0",
-    "sucrase": "^3.29.0",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.37.0",
+    "nodemon": "^2.0.22",
+    "prisma": "^4.12.0",
+    "typescript": "^5.0.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.12.0",
+    "chalk": "^5.2.0",
+    "debug": "^4.3.4",
+    "discord.js": "^14.8.0",
+    "ioredis": "^5.3.1",
+    "reflect-metadata": "^0.1.13",
+    "tsyringe": "^4.7.0"
   }
 }
