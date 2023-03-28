@@ -1,28 +1,27 @@
 {
   "compilerOptions": {
-    "lib": [
-      "ESNext"
-    ],
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "ES6",
-    "outDir": "dist",
-    "strict": true,
-    "sourceMap": true,
-    "experimentalDecorators": true,
+    "moduleResolution": "nodenext",
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
+    "declaration": true,
+    "newLine": "lf",
     "allowJs": true,
     "esModuleInterop": true,
-    // "declaration": true
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2020",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "resolveJsonModule": true,
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.js"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts", "run.cjs"]
 }
