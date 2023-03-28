@@ -1,14 +1,34 @@
-FROM node:18-alpine3.16
+FROM node:lts-alpine3.16 AS build
 
-WORKDIR /server
+WORKDIR /build
 
-COPY ./src/ /server/src
-COPY ./package.json /server/
-COPY ./yarn.lock /server/
-COPY ./prisma/ /server/prisma
-COPY ./tsconfig.json /server/tsconfig.json
+RUN npm i -g pnpm
 
-RUN yarn install
-RUN yarn build
+COPY ./package.json /build/package.json
+COPY ./pnpm-lock.yaml /build/pnpm-lock.yaml
 
-CMD yarn db-migrate && node dist/index.js
+RUN pnpm install --frozen-lockfile
+
+COPY ./tsconfig.json /build/tsconfig.json
+COPY ./prisma/ /build/prisma
+COPY ./src/ /build/src
+
+RUN pnpm build
+
+FROM node:lts-alpine3.16
+
+WORKDIR /bot
+
+RUN npm i -g pnpm
+
+RUN apk add openssl
+
+COPY --from=build /build/package.json /bot/package.json
+COPY --from=build /build/pnpm-lock.yaml /bot/pnpm-lock.yaml
+COPY --from=build /build/prisma /bot/prisma
+
+RUN pnpm install --frozen-lockfile --prod
+
+COPY --from=build /build/dist /bot/dist
+
+CMD [ "node", "dist/index.js" ]
