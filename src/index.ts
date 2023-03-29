@@ -1,12 +1,22 @@
-import { Duvua } from "./Client"
-import { config } from "./config"
+/* eslint-disable no-fallthrough */
+if (process.env.NODE_ENV !== "production") await import("dotenv/config");
 
-const { token } = config
+import "reflect-metadata";
+import { Client } from "./lib/Client.js";
+import url from "url";
+import { join } from "path";
+import debug from "debug";
+debug.enable("bot");
 
-if (!token || token.length < 10) {
-    throw new Error("NO VALID TOKEN PROVIDED\nGOT VALUE \"" + token + "\"")
-}
+const __dirname = join(url.fileURLToPath(new URL(".", import.meta.url)));
 
-const bot = new Duvua()
+if (!process.env.DISCORD_TOKEN) throw new Error("No token provided");
 
-bot.login(token)
+const client = Client.createDefault(process.env.DISCORD_TOKEN);
+
+client.forRootWiring(__dirname);
+
+client.autowireEvents();
+client.autowireCommands();
+
+client.login();
