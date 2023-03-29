@@ -44,7 +44,7 @@ console.error = (...message: unknown[]) => {
 };
 
 export class Logger {
-    ctx: string;
+    private ctx: string;
 
     constructor(ctx: string) {
         this.ctx = chalk.yellow(`[${ctx}]`);
