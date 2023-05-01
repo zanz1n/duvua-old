@@ -1,4 +1,4 @@
-import { Service } from "lib/decorators/Service.js";
+import { Service } from "../lib/decorators/Service.js";
 import querryString from "querystring";
 import { generate } from "./TranslatorTokenGenerator.js";
 
