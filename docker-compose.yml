@@ -1,26 +1,6 @@
-version: '3.7'
+version: "3.9"
 
 services:
-  # nodejs:
-  #   container_name: nodejs
-  #   build:
-  #     context: ./docker/dev
-  #     dockerfile: nodejs.dockerfile
-  #   env_file:
-  #     - .env
-  #   volumes:
-  #     - ./:/server
-  #   networks:
-  #     - botjs
-  #   depends_on:
-  #     - postgresql
-  #     - redisdb
-  #   environment:
-  #     DEBUG: "bot*"
-  #     NODE_NO_WARNINGS: 1
-  #   ports:
-  #     - 5555:5555
-
   nodejs:
     restart: always
     container_name: nodejs
@@ -35,21 +15,7 @@ services:
       - postgresql
       - redisdb
     environment:
-      DEBUG: "bot*"
       NODE_NO_WARNINGS: 1
-
-  duvuamusic:
-    restart: always
-    container_name: duvuamusic
-    build:
-      context: ./docker/
-      dockerfile: duvuamusic.dockerfile
-    env_file:
-      - .env
-    networks:
-      - botjs
-    depends_on:
-      - postgresql
 
   postgresql:
     restart: always
@@ -77,18 +43,6 @@ services:
       - 26379:6379
     volumes:
       - ./.docker-volumes/redis_volume:/data
-
-  # pgadmin:
-  #   container_name: pgadmin
-  #   image: dpage/pgadmin4
-  #   networks:
-  #     - botjs
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     GUNICORN_ACCESS_LOGFILE: /dev/null
-  #   ports:
-  #     - 2280:80
 
 networks:
   botjs:
