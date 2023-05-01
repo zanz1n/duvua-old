@@ -19,21 +19,21 @@
   "license": "ISC",
   "devDependencies": {
     "@types/debug": "^4.1.7",
-    "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^5.57.0",
-    "@typescript-eslint/parser": "^5.57.0",
+    "@types/node": "^18.16.3",
+    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@typescript-eslint/parser": "^5.59.1",
     "dotenv": "^16.0.3",
-    "eslint": "^8.37.0",
+    "eslint": "^8.39.0",
     "nodemon": "^2.0.22",
-    "prisma": "^4.12.0",
-    "typescript": "^5.0.2"
+    "prisma": "^4.13.0",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@prisma/client": "^4.12.0",
+    "@prisma/client": "^4.13.0",
     "chalk": "^5.2.0",
     "debug": "^4.3.4",
-    "discord.js": "^14.8.0",
-    "ioredis": "^5.3.1",
+    "discord.js": "^14.9.0",
+    "ioredis": "^5.3.2",
     "reflect-metadata": "^0.1.13",
     "tsyringe": "^4.7.0"
   }
