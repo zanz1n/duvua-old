@@ -1,0 +1,11 @@
+.env
+target/
+build/
+**/*.log
+dist/
+out/
+.idea/
+.project
+duvua-bot-music.iml
+.classpath
+.settings/
