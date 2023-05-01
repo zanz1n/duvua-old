@@ -16,6 +16,8 @@ export class KitsuService {
         private readonly translator: TranslatorService
     ) {}
 
+    private logger = new Logger("KistuService");
+
     public getAnimeFromName = async(name: string): Promise<AnimeData | null> => {
         const nameQuery = name.split(" ").join("-").toLowerCase();
 
@@ -36,11 +38,11 @@ export class KitsuService {
         });
 
         if (animeDb) {
-            Logger.debug("Find relation");
+            this.logger.debug("Find relation");
             return new AnimeData(animeDb);
         }
 
-        Logger.debug("Don't find relation");
+        this.logger.debug("Don't find relation");
 
         const data = await fetch(`https://kitsu.io/api/edge/anime?filter[text]=${nameQuery}`)
             .then(res => res.json().catch(() => null)) as AnimeSearchResponse;
@@ -78,14 +80,14 @@ export class KitsuService {
             to: "pt"
         }).then(result => {
             synopsis = result;
-        }).catch((err) => { Logger.error(err); });
+        }).catch((err) => { this.logger.error(err); });
 
         const genres: string[] = [];
 
         (await genresData).data.forEach(dt => genres.push(dt.attributes.name ?? ""));
 
         if (!animeDbFromKitsuId) {
-            Logger.debug("Don't find DB ... creating");
+            this.logger.debug("Don't find DB ... creating");
             animeDbFromKitsuId = await this.prisma.anime.create({
                 data: {
                     // THIS SYNTAX CAUSE AN UNEXPECTED BUG EVEN IF NON EQUAL PROPRERTIES OVERWRITEN
