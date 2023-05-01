@@ -71,6 +71,8 @@ export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
         this._postCommandsOnReady = true;
     }
 
+    private interactionLogger = new BaseLogger("InteractionManager");
+
     private async postCommands() {
         const rest = new REST({ version: "10" }).setToken(this._token);
 
@@ -92,7 +94,11 @@ export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
                 const cmd = this.commands.get(interaction.commandName);
                 if (cmd && cmd.enabled) {
                     if (cmd.needsDefer) await interaction.deferReply();
-                    cmd.run({ client: this, interaction: interaction as CommandBaseInteraction<boolean> }).catch((err) => { Logger.error(err); });
+                    try {
+                        await cmd.run({ client: this, interaction: interaction as CommandBaseInteraction<boolean> });
+                    } catch(err) {
+                        this.interactionLogger.error(err);
+                    }
                 }
             }
         },
