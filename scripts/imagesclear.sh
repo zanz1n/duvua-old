@@ -1,1 +1,0 @@
-docker image rm --force $(docker image ls -q) >/dev/null 1>/dev/null 2>/dev/null

@@ -1,4 +1,3 @@
-/* eslint-disable no-fallthrough */
 if (process.env.NODE_ENV !== "production") await import("dotenv/config");
 
 import "reflect-metadata";
