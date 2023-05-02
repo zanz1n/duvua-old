@@ -1,6 +1,9 @@
 # compiled output
 dist/
 node_modules/
+target/
+build/
+out/
 
 # Docker
 .docker_volumes/
