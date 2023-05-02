@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  nodejs:
+  duvua_main:
     restart: always
-    container_name: nodejs
+    container_name: duvua_main
     build:
       context: .
       dockerfile: ./main/Dockerfile
@@ -18,6 +18,19 @@ services:
       NODE_ENV: "production"
       DEBUG_HIDE_DATE: 1
       NODE_NO_WARNINGS: 1
+
+  duvua_music:
+    restart: always
+    container_name: duvua_music
+    build:
+      context: .
+      dockerfile: ./music/Dockerfile
+    env_file:
+      - .env
+    networks:
+      - botjs
+    depends_on:
+      - postgresql
 
   postgresql:
     restart: always
