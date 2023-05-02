@@ -93,7 +93,7 @@ export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
             if (interaction.isChatInputCommand()) {
                 const cmd = this.commands.get(interaction.commandName);
                 if (cmd && cmd.enabled) {
-                    if (cmd.needsDefer) await interaction.deferReply();
+                    if (cmd.needsDefer) await interaction.deferReply({ ephemeral: cmd.ephemeral ? true : undefined });
                     try {
                         await cmd.run({ client: this, interaction: interaction as CommandBaseInteraction<boolean> });
                     } catch(err) {
