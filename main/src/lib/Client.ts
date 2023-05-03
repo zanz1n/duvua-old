@@ -95,7 +95,7 @@ export class Client<Ready extends boolean = boolean> extends BaseClient<Ready> {
                 if (cmd && cmd.enabled) {
                     if (cmd.needsDefer) await interaction.deferReply({ ephemeral: cmd.ephemeral ? true : undefined });
                     try {
-                        await cmd.run({ client: this, interaction: interaction as CommandBaseInteraction<boolean> });
+                        await cmd.run({ client: this as Client<true>, interaction: interaction as CommandBaseInteraction<boolean> });
                     } catch(err) {
                         this.interactionLogger.error(err);
                     }

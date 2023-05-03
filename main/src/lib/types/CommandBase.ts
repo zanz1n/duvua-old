@@ -15,7 +15,7 @@ export enum CommandBaseCategory {
 
 export interface CommandBaseRunOpts<Defered extends boolean> {
     interaction: CommandBaseInteraction<Defered>;
-    client: Client
+    client: Client<true>
 }
 
 export interface CommandBaseOpts {
