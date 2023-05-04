@@ -60,7 +60,7 @@ public class PlayerManager {
 
             private void resolveFailedLoad() {
                 textChannel.sendMessageEmbeds(
-                        SEmbedBuilder.createDefault("Não foi possível achar uma música" +
+                        SEmbedBuilder.createDefault("Não foi possível achar uma música " +
                                 "buscando por`"+
                                 trackUrl.replace("ytsearch:", "")
                                 +"`")
