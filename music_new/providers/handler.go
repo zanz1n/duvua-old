@@ -9,15 +9,22 @@ import (
 type Command struct {
 	Handler func(c *discordgo.Session, e *discordgo.InteractionCreate) error
 	Data    discordgo.ApplicationCommand
+	Button  bool
+	Command bool
 }
 
 type CommandHandler struct {
-	commands map[string]Command
-	session  *discordgo.Session
+	commands   map[string]Command
+	components map[string]Command
+	session    *discordgo.Session
 }
 
 func (c *CommandHandler) AddCommand(cmd Command) {
-	c.commands[cmd.Data.Name] = cmd
+	if cmd.Button {
+		c.components[cmd.Data.Name] = cmd
+	} else {
+		c.commands[cmd.Data.Name] = cmd
+	}
 }
 
 func (c *CommandHandler) GetData() []*discordgo.ApplicationCommand {
@@ -33,7 +40,19 @@ func (c *CommandHandler) GetData() []*discordgo.ApplicationCommand {
 }
 
 func (c *CommandHandler) onInteraction(s *discordgo.Session, e *discordgo.InteractionCreate) {
+	if e.Type == discordgo.InteractionApplicationCommand {
+		data := e.Data.(*discordgo.ApplicationCommandInteractionData)
 
+		if command, ok := c.commands[data.Name]; ok {
+			go command.Handler(s, e)
+		}
+	} else if e.Type == discordgo.InteractionMessageComponent {
+		data := e.Data.(*discordgo.MessageComponentInteractionData)
+
+		if component, ok := c.components[data.CustomID]; ok {
+			go component.Handler(s, e)
+		}
+	}
 }
 
 func (c *CommandHandler) PostCommands() ([]*discordgo.ApplicationCommand, error) {
