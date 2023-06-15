@@ -1,0 +1,25 @@
+-- Types
+
+DROP TYPE IF EXISTS "AnimeAttributesAgeRating"
+
+DROP TYPE IF EXISTS "AnimeAttributesSubType"
+
+DROP TYPE IF EXISTS "AnimeAttributesStatus"
+
+DROP TYPE IF EXISTS "MemberJob"
+
+DROP TYPE IF EXISTS "WCType"
+
+-- Tables
+
+DROP TABLE IF EXISTS "Member"
+
+DROP TABLE IF EXISTS "User"
+
+DROP TABLE IF EXISTS "Guild"
+
+DROP TABLE IF EXISTS "Welcome"
+
+DROP TABLE IF EXISTS "Anime"
+
+DROP TABLE IF EXISTS "AnimeReference"

@@ -2,11 +2,11 @@ version: "2"
 sql:
   - engine: "postgresql"
     queries: "sql/queries.sql"
-    schema: "sql/schema.sql"
+    schema: "sql/migrations/"
     gen:
       go:
         emit_json_tags: true
         json_tags_case_style: camel
         emit_empty_slices: true
         package: "dba"
-        out: "internal/dba"
+        out: "shared/internal/dba"

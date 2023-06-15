@@ -1,3 +1,5 @@
 go 1.20
 
-use ./music_new
+use (
+	./shared
+)
