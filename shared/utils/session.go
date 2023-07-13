@@ -15,9 +15,5 @@ func NewSession(token string, intent *discordgo.Intent) (*discordgo.Session, err
 		client.Identify.Intents = *intent
 	}
 
-	if err = client.Open(); err != nil {
-		return nil, err
-	}
-
 	return client, nil
 }
