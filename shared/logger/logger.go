@@ -40,7 +40,7 @@ func Init() {
 	LoggerCfg = &Config{}
 
 	LoggerCfg.InfoPrefix = "\tINFO\t"
-	LoggerCfg.ErrorPrefix = "\tERROR\n"
+	LoggerCfg.ErrorPrefix = "\tERROR\t"
 	LoggerCfg.HttpPrefix = "\tHTTP\t"
 	LoggerCfg.WarningPrefix = "\tWARN\t"
 
